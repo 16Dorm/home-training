@@ -92,13 +92,13 @@ def main():
     cap = cv2.VideoCapture('1.mp4')
     pTime = 0
     detector=poseDetector()
-
+    index=0
 
     while True:
         success, img = cap.read()
-        index=0
         img=detector.findPose(img,index)
         lmList=detector.findPosition(img,draw=False) #draw를 false시켜서 값만 가져옴 밑에서 그릴 수 있음
+        index+=1
         print(lmList[14]) #14는 미디어파이프의 데이터셋에서 가져온 팔꿈치의 위치가 14번이라
         #14번의 좌표값만 보여줌 !
         cv2.circle(img, (lmList[14][1], lmList[14][2]), 15, (0, 0, 255), cv2.FILLED) #14번 팔꿈치만 크게 만듬
