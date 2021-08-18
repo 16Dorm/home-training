@@ -27,7 +27,7 @@ class poseDetector():
 
         #포즈찾기
     def findPose(self, img, draw=True): #사용자는 그림을 그리시겠습니까 아니면 이미지에 표시하겠습니까
-
+        black_img = np.zeros((640, 480, 3), dtype=np.uint8)
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.pose.process(imgRGB)
 
@@ -36,6 +36,9 @@ class poseDetector():
             if draw:
                 self.mpDraw.draw_landmarks(img,self.results.pose_landmarks,
                                             self.mpPose.POSE_CONNECTIONS) #이미지의 좌표에 점을 생성,라인생성
+                self.mpDraw.draw_landmarks(black_img, self.results.pose_landmarks,self.mpPose.POSE_CONNECTIONS)
+                cv2.imwrite('Result/image%d.jpg' % index, black_img)
+                index = index + 1
                 #내가 원하는 랜드마크 번호 5를 원하면
         return img
 
