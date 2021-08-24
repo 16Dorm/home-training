@@ -1,3 +1,6 @@
+*.json
+__pycahe__
+*.pyc
 *.jpg
 *.mp4
 *.png
