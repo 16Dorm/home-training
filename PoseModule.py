@@ -4,6 +4,9 @@ import mediapipe as mp
 import time
 import math #angle을 구하기위해서 사용
 
+f = open("video_name.txt", 'r')
+m_name = f.read()
+
 #클래스 선언
 class poseDetector():
 
@@ -32,7 +35,7 @@ class poseDetector():
 
         self.results = self.pose.process(imgRGB)
         self.mpDraw.draw_landmarks(black_img, self.results.pose_landmarks, self.mpPose.POSE_CONNECTIONS)
-        cv2.imwrite('Result/image%d.jpg' % index, black_img)
+        cv2.imwrite('Result/'+ m_name + '/image%d.jpg' % index, black_img)
         
         # print(results.pose_landmarks) #결과를 확인 x,y,z좌표 랜드마크를 확인
         if self.results.pose_landmarks:
@@ -91,7 +94,7 @@ class poseDetector():
         return angle
 
 def main():
-    cap = cv2.VideoCapture('1.mp4')
+    cap = cv2.VideoCapture(m_name + '.mp4')
     pTime = 0
     detector=poseDetector()
     index=0

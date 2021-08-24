@@ -8,8 +8,10 @@ mpPose=mp.solutions.pose
 pose=mpPose.Pose()
 
 
+f = open("video_name.txt", 'r')
+m_name = f.read()
+cap = cv2.VideoCapture(m_name + ".mp4")
 
-cap = cv2.VideoCapture('1.mp4')
 index = 0
 
 pTime=0

@@ -3,7 +3,10 @@ import numpy as np
 import time
 import PoseModule as pm
 
-cap = cv2.VideoCapture("1.mp4")
+f = open("video_name.txt", 'r')
+m_name = f.read()
+cap = cv2.VideoCapture(m_name + ".mp4")
+
 # cap = cv2.VideoCapture(0) #카메라 번호
 cap2=cv2.VideoCapture(0) #카메라 번호
 
@@ -11,13 +14,13 @@ detector =pm.poseDetector()
 count = 0
 dir = 0
 pTime = 0
-index=0
+index = 0
 while True:
     success, img =cap.read()
     if not success:
         break
     img = cv2.resize(img, (1280,720)) #영상의 크기 조절, 프레임 조절할 수 있다
-    black_img = np.zeros((640, 480, 3), dtype=np.uint8) ##데이터 저장용 검은배경 이미지 생성
+    black_img = np.zeros((480, 640, 3), dtype=np.uint8) ##데이터 저장용 검은배경 이미지 생성
     # img = cv2.imread("2.PNG")  # 각도를 얻기 위한 이미지 각도를 얻고 주석
     # 이후에 할일은 포즈 모듈을 가져와야함 포즈 모듈로 각도 재기
 
