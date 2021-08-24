@@ -5,7 +5,7 @@ import PoseModule as pm
 
 f = open("video_name.txt", 'r')
 m_name = f.read()
-cap = cv2.VideoCapture(m_name + ".mp4")
+cap = cv2.VideoCapture("./Video/" + m_name + ".mp4")
 
 # cap = cv2.VideoCapture(0) #카메라 번호
 cap2=cv2.VideoCapture(0) #카메라 번호
