@@ -33,6 +33,7 @@ class poseDetector():
         self.results = self.pose.process(imgRGB)
         self.mpDraw.draw_landmarks(black_img, self.results.pose_landmarks, self.mpPose.POSE_CONNECTIONS)
         cv2.imwrite('Result/image%d.jpg' % index, black_img)
+        
         # print(results.pose_landmarks) #결과를 확인 x,y,z좌표 랜드마크를 확인
         if self.results.pose_landmarks:
             if draw:
