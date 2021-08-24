@@ -11,15 +11,18 @@ detector =pm.poseDetector()
 count = 0
 dir = 0
 pTime = 0
-
+index=0
 while True:
     success, img =cap.read()
     if not success:
         break
     img = cv2.resize(img, (1280,720)) #영상의 크기 조절, 프레임 조절할 수 있다
+    black_img = np.zeros((640, 480, 3), dtype=np.uint8) ##데이터 저장용 검은배경 이미지 생성
     # img = cv2.imread("2.PNG")  # 각도를 얻기 위한 이미지 각도를 얻고 주석
     # 이후에 할일은 포즈 모듈을 가져와야함 포즈 모듈로 각도 재기
-    img = detector.findPose(img, False) #false를 해서 우리가 보고자하는 점 외에는 다 제거
+
+    img = detector.findPose(img, black_img, index, False) #false를 해서 우리가 보고자하는 점 외에는 다 제거
+    index+=1
     lmList = detector.findPosition(img, False) #그리기를 원하지 않으므로 false
     # print(lmList) #좌표를 프린트
     if len(lmList)!=0:
@@ -46,7 +49,7 @@ while True:
                 count += 0.5
                 dir = 0
         print(count)
-
+        print("index =%d", index)
         #draw bar
         cv2.rectangle(img, (1100, 100), (1175, 650), color, 3)
         cv2.rectangle(img, (1100, int(bar)), (1175, 650), color, cv2.FILLED)
