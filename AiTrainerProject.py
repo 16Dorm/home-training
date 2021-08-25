@@ -2,12 +2,11 @@ import cv2
 import numpy as np
 import time
 import PoseModule as pm
+from utils.defineLabel import defineLabel
 
 f = open("video_name.txt", 'r')
 m_name = f.read()
 cap = cv2.VideoCapture("./Video/" + m_name + ".mp4")
-
-# cap = cv2.VideoCapture(0) #카메라 번호
 cap2=cv2.VideoCapture(0) #카메라 번호
 
 detector =pm.poseDetector()
@@ -15,12 +14,7 @@ count = 0
 dir = 0
 pTime = 0
 index = 0
-head=[]
-shoulder=[]
-elbow=[]
-hand=[]
-hip=[]
-foot=[]
+label_list = []
 
 while True:
     success, img =cap.read()
@@ -35,10 +29,12 @@ while True:
     index+=1
     lmList = detector.findPosition(img, False) #그리기를 원하지 않으므로 false
     # print(lmList) #좌표를 프린트
+    keypoint = [] # 핵심 키포인트를 담을 리스트
     if len(lmList)!=0:
         # print(lmList[24][1])  # 24번은 엉덩이 x축 좌표만
         # print(lmList[1][1]) #1번은 눈을 표시 x축 좌표만
-       
+        print(lmList[0][2])
+        
         # Right Arm
         if lmList[24][1]<lmList[1][1]:
             angle = detector.findAngle(img, 12,14,16)
@@ -46,12 +42,12 @@ while True:
             per = np.interp(angle, (65, 160), (100, 0))
             # print(angle, per)
             bar = np.interp(angle, (65, 160), (650, 100))  # 앞에가 최소 뒤에가 최대
-            head.append(lmList[0][2])
-            shoulder.append(lmList[11][2])
-            elbow.append(lmList[13][2])
-            hand.append(lmList[15][2])
-            hip.append(lmList[23][2])
-            foot.append(lmList[27][2])
+            head = lmList[0][2]
+            shoulder = (lmList[11][2])
+            elbow = (lmList[13][2])
+            hand = (lmList[15][2])
+            hip = (lmList[23][2])
+            foot = (lmList[27][2])
         
         # Left Arm
         else:
@@ -60,12 +56,17 @@ while True:
             per = np.interp(angle, (195, 265), (100, 0))
             # print(angle, per)
             bar = np.interp(angle, (195, 265), (650, 100))  # 앞에가 최소 뒤에가 최대
-            head.append(lmList[0][2])
-            shoulder.append(lmList[12][2])
-            elbow.append(lmList[14][2])
-            hand.append(lmList[16][2])
-            hip.append(lmList[24][2])
-            foot.append(lmList[28][2])
+            head = (lmList[0][2])
+            shoulder = (lmList[12][2])
+            elbow = (lmList[14][2])
+            hand = (lmList[16][2])
+            hip = (lmList[24][2])
+            foot = (lmList[28][2])
+
+        keypoint = [head, shoulder, elbow, hand, hip, foot] # CSV생성용 키포인트 데이터 생성
+        k_max, k_min = max(keypoint), min(keypoint) 
+        answer = defineLabel(keypoint, k_max, k_min)  # 레이블 구분 함수 (0,1,2)리턴
+        label_list.append(answer) # index별로 뽑기위해 keypoint 리스트에 추가
 
         #check for the push up curls
         color = (255,0,255)
@@ -79,8 +80,8 @@ while True:
             if dir==1:
                 count += 0.5
                 dir = 0
-        print(count)
-        print("index =%d", index)
+        print(f"count: {count}")
+        print(f"index: {index}")
         #draw bar
         cv2.rectangle(img, (1100, 100), (1175, 650), color, 3)
         cv2.rectangle(img, (1100, int(bar)), (1175, 650), color, cv2.FILLED)
@@ -102,5 +103,5 @@ while True:
 
 final_max=[max(head),max(shoulder),max(elbow),max(hand),max(hip),max(foot)]
 final_min=[min(head),min(shoulder),min(elbow),min(hand),min(hip),min(foot)]
-print(final_max)
-print(final_min)
+print(f"final_max: {final_max}")
+print(f"final_min: {final_min}")
