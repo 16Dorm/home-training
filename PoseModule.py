@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -29,13 +30,17 @@ class poseDetector():
         self.pose=self.mpPose.Pose(self.mode,self.upBody,self.smooth, self.detectionCon
                                    ,self.trackingCon)
 
+        if not os.path.exists("./train/image"): # train/image폴더 생성
+            os.mkdir('./train')
+            os.mkdir('./train/image')
+
         #포즈찾기
     def findPose(self, img, black_img, index ,draw=True): #사용자는 그림을 그리시겠습니까 아니면 이미지에 표시하겠습니까
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         self.results = self.pose.process(imgRGB)
         self.mpDraw.draw_landmarks(black_img, self.results.pose_landmarks, self.mpPose.POSE_CONNECTIONS)
-        cv2.imwrite('Result/'+ m_name + '/image%d.jpg' % index, black_img)
+        cv2.imwrite('train/image/'+ m_name + '_image%d.jpg'%index, black_img)
         
         # print(results.pose_landmarks) #결과를 확인 x,y,z좌표 랜드마크를 확인
         if self.results.pose_landmarks:
@@ -104,7 +109,7 @@ def main():
         img=detector.findPose(img,index)
         lmList=detector.findPosition(img,draw=False) #draw를 false시켜서 값만 가져옴 밑에서 그릴 수 있음
         index+=1
-        print(lmList[14]) #14는 미디어파이프의 데이터셋에서 가져온 팔꿈치의 위치가 14번이라
+        # print(lmList[14]) #14는 미디어파이프의 데이터셋에서 가져온 팔꿈치의 위치가 14번이라
         #14번의 좌표값만 보여줌 !
         cv2.circle(img, (lmList[14][1], lmList[14][2]), 15, (0, 0, 255), cv2.FILLED) #14번 팔꿈치만 크게 만듬
 
