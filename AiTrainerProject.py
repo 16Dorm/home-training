@@ -3,10 +3,11 @@ import numpy as np
 import time
 import PoseModule as pm
 from utils.defineLabel import defineLabel
+from utils.WriteCSV import WriteCSV
 
 f = open("video_name.txt", 'r')
-m_name = f.read()
-cap = cv2.VideoCapture("./Video/" + m_name + ".mp4")
+video_name = f.read()
+cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
 cap2=cv2.VideoCapture(0) #카메라 번호
 
 detector =pm.poseDetector()
@@ -33,7 +34,6 @@ while True:
     if len(lmList)!=0:
         # print(lmList[24][1])  # 24번은 엉덩이 x축 좌표만
         # print(lmList[1][1]) #1번은 눈을 표시 x축 좌표만
-        print(lmList[0][2])
         
         # Right Arm
         if lmList[24][1]<lmList[1][1]:
@@ -68,7 +68,8 @@ while True:
         #answer = defineLabel(keypoint, k_max, k_min)   레이블 구분 함수 (0,1,2)리턴
         keypoint = [shoulder,hand] 
         answer = defineLabel(keypoint)
-        label_list.append(answer) # index별로 뽑기위해 keypoint 리스트에 추가
+        label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가
+
 
         #check for the push up curls
         color = (255,0,255)
@@ -82,7 +83,7 @@ while True:
             if dir==1:
                 count += 0.5
                 dir = 0
-        print(f"count: {count}")
+        #print(f"count: {count}")
         print(f"index: {index}")
         #draw bar
         cv2.rectangle(img, (1100, 100), (1175, 650), color, 3)
@@ -107,4 +108,7 @@ while True:
 #final_min=[min(head),min(shoulder),min(elbow),min(hand),min(hip),min(foot)]
 #print(f"final_max: {final_max}")
 #print(f"final_min: {final_min}")
+
 print(label_list)
+writecsv = WriteCSV('./train/', label_list, video_name)
+writecsv.merge_train_csv()
