@@ -1,5 +1,5 @@
 
-def defineLabel(keypoint):
+def defineLabel(angle):
     """
     keypoint데이터, min, max를 활용하여 레이블 0,1,2로 구분해줍니다.
     :return answer: 0,1,2
@@ -15,7 +15,7 @@ def defineLabel(keypoint):
     // 위 - 2
     data: 어깨-265 손-488 
     sholder - hand 간 거리 : 223
-    """
+    
     answer=None
     sholder=0
     hand=1
@@ -27,5 +27,14 @@ def defineLabel(keypoint):
         answer=1
     elif ((sholder_hand_length >=170) and (sholder_hand_length < 240)) :
         answer=2
-    
+    """
+    answer = None
+    if (angle > 40 and angle <90):
+        answer=1
+    elif (angle >=90 and angle <140):
+        answer=2
+    elif(angle>=140 and angle < 180):
+        answer=3
+    else:
+        answer=0
     return answer
