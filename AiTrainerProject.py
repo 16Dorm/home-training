@@ -1,3 +1,4 @@
+from math import inf
 import cv2
 import numpy as np
 import time
@@ -5,10 +6,24 @@ import PoseModule as pm
 from utils.defineLabel import defineLabel
 from utils.WriteCSV import WriteCSV
 
+
+# 영상 선택 및 실행
 f = open("video_name.txt", 'r')
 video_name = f.read()
 cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
 cap2=cv2.VideoCapture(0) #카메라 번호
+
+# 사전 준비시간을 label0으로 잘라내기 위한 작업
+with open('video_list.txt', 'r') as infile:
+    data = infile.readlines()
+    for i in data:
+        v_name, start_sec, end_sec = (i.split())
+        if (video_name == v_name):
+            start_sec = int(start_sec)
+            end_sec = int(end_sec)
+            if (end_sec == 0):
+                end_sec = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            break;
 
 detector =pm.poseDetector()
 count = 0
@@ -25,7 +40,7 @@ while True:
     black_img = np.zeros((480, 640, 3), dtype=np.uint8) ##데이터 저장용 검은배경 이미지 생성
     # img = cv2.imread("2.PNG")  # 각도를 얻기 위한 이미지 각도를 얻고 주석
     # 이후에 할일은 포즈 모듈을 가져와야함 포즈 모듈로 각도 재기
-
+    
     img = detector.findPose(img, black_img, index, False) #false를 해서 우리가 보고자하는 점 외에는 다 제거
     index+=1
     lmList = detector.findPosition(img, False) #그리기를 원하지 않으므로 false
@@ -67,8 +82,9 @@ while True:
         #k_max, k_min = max(keypoint), min(keypoint)  최소값, 최대값 이용하지않고 sholder - hand간 거리로 자세 레이블링
         #answer = defineLabel(keypoint, k_max, k_min)   레이블 구분 함수 (0,1,2)리턴
         #keypoint = [shoulder,hand] 
-        # 시작점 끝점 정해서 그 외는 result = 0
-        answer = defineLabel(angle)
+
+        # 사전에 입력한 시작점과 끝점 외의 준비자세는 레이블을 0으로 둠
+        answer = defineLabel(angle, int(cap.get(cv2.CAP_PROP_POS_FRAMES)), start_sec, end_sec)
         label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가
 
 
@@ -85,7 +101,7 @@ while True:
                 count += 0.5
                 dir = 0
         #print(f"count: {count}")
-        print(f"index: {index}")
+        #print(f"index: {index}")
         #draw bar
         cv2.rectangle(img, (1100, 100), (1175, 650), color, 3)
         cv2.rectangle(img, (1100, int(bar)), (1175, 650), color, cv2.FILLED)

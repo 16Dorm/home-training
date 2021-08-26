@@ -1,0 +1,5 @@
+1 0 0
+pushup_0 7 41
+pushup_1 4 41
+pushup_2 0 0
+pushup_3 7 26
