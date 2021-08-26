@@ -67,6 +67,7 @@ while True:
         #k_max, k_min = max(keypoint), min(keypoint)  최소값, 최대값 이용하지않고 sholder - hand간 거리로 자세 레이블링
         #answer = defineLabel(keypoint, k_max, k_min)   레이블 구분 함수 (0,1,2)리턴
         #keypoint = [shoulder,hand] 
+        # 시작점 끝점 정해서 그 외는 result = 0
         answer = defineLabel(angle)
         label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가
 
