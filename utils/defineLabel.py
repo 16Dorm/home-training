@@ -32,6 +32,9 @@ def defineLabel(angle, frame, start_sec, end_sec):
         answer=2
     """
     
+    if (angle > 180):
+        angle = 360 - angle
+
     answer = None
     #print(frame, start_sec*30, end_sec*30)
     if( frame < start_sec * 30 or frame > end_sec * 30):
