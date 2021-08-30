@@ -23,7 +23,7 @@ with open('video_list.txt', 'r') as infile:
             end_sec = int(end_sec)
             if (end_sec == 0):
                 end_sec = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-            break;
+            break
 
 detector =pm.poseDetector()
 count = 0
@@ -31,7 +31,7 @@ dir = 0
 pTime = 0
 index = 0
 label_list = []
-
+keypoint_list = []
 while True:
     success, img =cap.read()
     if not success:
@@ -78,9 +78,10 @@ while True:
             hip = (lmList[24][2])
             foot = (lmList[28][2])
 
-        #keypoint = [head, shoulder, elbow, hand, hip, foot]  CSV생성용 키포인트 데이터 생성
-        #k_max, k_min = max(keypoint), min(keypoint)  최소값, 최대값 이용하지않고 sholder - hand간 거리로 자세 레이블링
-        #answer = defineLabel(keypoint, k_max, k_min)   레이블 구분 함수 (0,1,2)리턴
+        keypoint = [head, shoulder, elbow, hand, hip, foot]  #CSV생성용 키포인트 데이터 생성
+        keypoint_list.append(keypoint) 
+        #k_max, k_min = max(keypoint), min(keypoint)  #최소값, 최대값 이용하지않고 sholder - hand간 거리로 자세 레이블링
+        #answer = defineLabel(keypoint, k_max, k_min)   #레이블 구분 함수 (0,1,2)리턴
         #keypoint = [shoulder,hand] 
 
         # 사전에 입력한 시작점과 끝점 외의 준비자세는 레이블을 0으로 둠
@@ -127,5 +128,5 @@ while True:
 #print(f"final_min: {final_min}")
 
 print(label_list)
-writecsv = WriteCSV('./train/', label_list, video_name)
+writecsv = WriteCSV('./train/', label_list, keypoint_list, video_name)
 writecsv.merge_train_csv()

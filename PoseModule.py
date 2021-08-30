@@ -30,8 +30,9 @@ class poseDetector():
         self.pose=self.mpPose.Pose(self.mode,self.upBody,self.smooth, self.detectionCon
                                    ,self.trackingCon)
 
-        if not os.path.exists("./train/image"): # train/image폴더 생성
+        if not os.path.exists("./train"): # train/image폴더 생성
             os.mkdir('./train')
+        if not os.path.exists("./train/image"): # train/image폴더 생성
             os.mkdir('./train/image')
 
         #포즈찾기
