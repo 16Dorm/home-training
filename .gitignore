@@ -4,11 +4,7 @@ __pycache__
 *.mp4
 *.png
 image/
-
+video_name.txt
 
 # 테스트 파일
 test.py
-
-utils/show_images.py
-train/train.csv
-video_name.txt
