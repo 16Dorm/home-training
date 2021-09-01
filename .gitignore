@@ -9,6 +9,6 @@ image/
 # 테스트 파일
 test.py
 
-
-Verification/show_images.py
+utils/show_images.py
+train/train.csv
 video_name.txt

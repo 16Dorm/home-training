@@ -18,7 +18,7 @@ class WriteCSV():
         self.keypoints = keypoints
         self.video_name = video_name
         self.coumns = ["head", "shoulder", "elbow", "hand", "hip", "foot", "angle", "image_path", "label"]
-        
+
         if not os.path.exists(self.save_path):
             self._make_train_csv()
 
@@ -49,7 +49,7 @@ class WriteCSV():
 
         new_list = []
         for i in range(len(self.datas)):
-            img_name = self.video_name + "_image" + str(self.datas[i][0]) + ".jpg"
+            img_name = self.video_name + "_image" + str(self.datas[i][0]-1) + ".jpg"
             new = self.keypoints[i]
             new.append(str(self.path + 'image/' + img_name))
             new.append(int(self.datas[i][1]))
