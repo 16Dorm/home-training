@@ -4,19 +4,21 @@ import cv2
 
 df = pd.read_csv('./train/train.csv', names=['a', 'b', 'c', 'd', 'e', 'f', 'g', 'images', 'label'])
 
+# 필요한 데이터만 변수에 넣음
 img_name = df['images']
 img_label = df['label']
 
-
+# for문을 편하게 돌기 위해 zip으로 묶음
 images_and_labels = list(zip(img_name, img_label))
 
+# for문을 돌면서 필요한 변수들 선언
 pre_img_name = img_name[0][:22]
 start_index = 0
 end_index = 30
 df_len = len(df)
 is_end = False
 
-# 이미지 출력
+# 모든 cvs에 저장된 이미지 출력
 while(start_index < df_len):
     for index, (img_path, label) in enumerate(images_and_labels[start_index:end_index]):
         # 영상 이름이 바뀌면 멈추도록함
