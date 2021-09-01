@@ -20,6 +20,7 @@ is_end = False
 
 # 모든 cvs에 저장된 이미지 출력
 while(start_index < df_len):
+    fig = plt.figure(figsize=(15, 10)) 
     for index, (img_path, label) in enumerate(images_and_labels[start_index:end_index]):
         # 영상 이름이 바뀌면 멈추도록함
         if(pre_img_name != img_path[:22]):
@@ -28,7 +29,7 @@ while(start_index < df_len):
             break
         
         # 제목, 위치 등 설정
-        plt.suptitle(img_path[14:22],fontsize=20)
+        plt.suptitle(img_path[14:22],fontsize=25)
         plt.subplot(6, 5, index + 1)
         plt.axis('off')
 
@@ -38,7 +39,8 @@ while(start_index < df_len):
         # 이미지 불러오고 라벨링 값과 함께 나타내기
         img = cv2.imread(img_path)
         plt.imshow(img, cmap=plt.cm.gray_r, interpolation='nearest')
-        plt.title('label: %i' % label)
+        plt.subplots_adjust(wspace=0.8)
+        plt.title('label: %i' % label, fontsize=12)
     
     # 출력
     plt.show()
