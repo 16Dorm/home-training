@@ -51,7 +51,7 @@ class WriteCSV():
         for i in range(len(self.datas)):
             img_name = self.video_name + "_image" + str(self.datas[i][0]) + ".jpg"
             new = self.keypoints[i]
-            new.append(str(self.path + img_name))
+            new.append(str(self.path + 'image/' + img_name))
             new.append(int(self.datas[i][1]))
             new_list.append(new)
             print(new)
