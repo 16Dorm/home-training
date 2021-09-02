@@ -52,11 +52,13 @@ while True:
         
         # Right Arm
         if lmList[24][1]<lmList[1][1]:
-            angle = detector.findAngle(img, 12,14,16)
+            elbow_angle = detector.findAngle(img, 12,14,16)
+            hip_angle= detector.findAngle(img,12,24,26)
+            knee_angle= detector.findAngle(img,24,26,28)
             # 각도를 퍼센트로 나타내는 코드
-            per = np.interp(angle, (65, 160), (100, 0))
+            per = np.interp(elbow_angle, (65, 160), (100, 0))
             # print(angle, per)
-            bar = np.interp(angle, (65, 160), (650, 100))  # 앞에가 최소 뒤에가 최대
+            bar = np.interp(elbow_angle, (65, 160), (650, 100))  # 앞에가 최소 뒤에가 최대
             head = lmList[0][2]
             shoulder = (lmList[11][2])
             elbow = (lmList[13][2])
@@ -66,11 +68,13 @@ while True:
         
         # Left Arm
         else:
-            angle=detector.findAngle(img, 11, 13, 15)
+            elbow_angle=detector.findAngle(img, 11, 13, 15)
+            hip_angle= detector.findAngle(img,11,23,25)
+            knee_angle= detector.findAngle(img,23,25,27)
             # 각도를 퍼센트로 나타내는 코드
-            per = np.interp(angle, (195, 265), (100, 0))
+            per = np.interp(elbow_angle, (195, 265), (100, 0))
             # print(angle, per)
-            bar = np.interp(angle, (195, 265), (650, 100))  # 앞에가 최소 뒤에가 최대
+            bar = np.interp(elbow_angle, (195, 265), (650, 100))  # 앞에가 최소 뒤에가 최대
             head = (lmList[0][2])
             shoulder = (lmList[12][2])
             elbow = (lmList[14][2])
@@ -78,17 +82,17 @@ while True:
             hip = (lmList[24][2])
             foot = (lmList[28][2])
 
-        keypoint = [head, shoulder, elbow, hand, hip, foot, int(angle)]  #CSV생성용 키포인트 데이터 생성
+        keypoint = [head, shoulder, elbow, hand, hip, foot, int(elbow_angle), int(hip_angle),int(knee_angle)]  #CSV생성용 키포인트 데이터 생성
         keypoint_list.append(keypoint) 
         #k_max, k_min = max(keypoint), min(keypoint)  #최소값, 최대값 이용하지않고 sholder - hand간 거리로 자세 레이블링
         #answer = defineLabel(keypoint, k_max, k_min)   #레이블 구분 함수 (0,1,2)리턴
         #keypoint = [shoulder,hand] 
 
         # 사전에 입력한 시작점과 끝점 외의 준비자세는 레이블을 0으로 둠
-        answer = defineLabel(angle, int(cap.get(cv2.CAP_PROP_POS_FRAMES)), start_sec, end_sec)
+        answer = defineLabel(elbow_angle, int(cap.get(cv2.CAP_PROP_POS_FRAMES)), start_sec, end_sec)
         label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가
 
-
+        print(hip_angle,elbow_angle,knee_angle)
         #check for the push up curls
         color = (255,0,255)
         if per==100:
