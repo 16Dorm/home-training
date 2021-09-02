@@ -17,7 +17,7 @@ class WriteCSV():
         self.datas = datas
         self.keypoints = keypoints
         self.video_name = video_name
-        self.coumns = ["head", "shoulder", "elbow", "hand", "hip", "foot", "angle", "image_path", "label"]
+        self.coumns = ["head", "shoulder", "elbow", "hand", "hip", "foot", "elbow_angle", "hip_angle", "knee_angle", "image_path", "label"]
 
         if not os.path.exists(self.save_path):
             self._make_train_csv()
