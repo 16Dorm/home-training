@@ -1,5 +1,5 @@
 
-def defineLabel(angle, frame, start_sec, end_sec):
+def defineLabel(elbow_angle, hip_angle, knee_angle, frame, start_sec, end_sec):
     """
     keypoint데이터, min, max를 활용하여 레이블 0,1,2,3로 구분해줍니다.
     :return answer: 0,1,2
@@ -30,10 +30,31 @@ def defineLabel(angle, frame, start_sec, end_sec):
         answer=1
     elif ((sholder_hand_length >=170) and (sholder_hand_length < 240)) :
         answer=2
+
+
+    세진
+    엉덩이 165-195
+    무릎 155-185
+
+    요한
+    엉덩이 150-210
+    무릎 145-175
+
+    병국
+    엉덩이 155-185
+    무릎 185-215
+
+    광우
+    엉덩이 160-190
+    무릎 175-205
+
+    유튜브
+    엉덩이 150-180
+    무릎 180-210
     """
     
-    if (angle > 180):
-        angle = 360 - angle
+    if (elbow_angle > 180):
+        elbow_angle  = 360 - elbow_angle 
 
     answer = None
     #print(frame, start_sec*30, end_sec*30)
@@ -41,15 +62,16 @@ def defineLabel(angle, frame, start_sec, end_sec):
         answer = 0
         print('-')
     else:
-        if (angle > 40 and angle <90):
-            answer=1
-            print(1)
-        elif (angle >=90 and angle <140):
-            answer=2
-            print(2)
-        elif(angle>=140 and angle < 180):
-            answer=3
-            print(3)
+        if((hip_angle >= 150 and hip_angle <= 210) and (knee_angle >= 145 and knee_angle <=215)):
+            if (elbow_angle  > 40 and elbow_angle  <90):
+                answer=1
+                print(1)
+            elif (elbow_angle  >=90 and elbow_angle  <140):
+                answer=2
+                print(2)
+            elif(elbow_angle >=140 and elbow_angle  < 180):
+                answer=3
+                print(3)
         else:
             answer=0
             print(0)

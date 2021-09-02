@@ -89,7 +89,7 @@ while True:
         #keypoint = [shoulder,hand] 
 
         # 사전에 입력한 시작점과 끝점 외의 준비자세는 레이블을 0으로 둠
-        answer = defineLabel(elbow_angle, int(cap.get(cv2.CAP_PROP_POS_FRAMES)), start_sec, end_sec)
+        answer = defineLabel(elbow_angle,hip_angle,knee_angle, int(cap.get(cv2.CAP_PROP_POS_FRAMES)), start_sec, end_sec)
         label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가
 
         print(hip_angle,elbow_angle,knee_angle)
