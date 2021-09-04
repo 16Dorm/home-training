@@ -2,6 +2,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import cv2
 
+
+select_video = 'pushup_2'
+
+
 df = pd.read_csv('./train/train.csv', names=['a', 'b', 'c', 'd', 'e', 'f', 'g', 'images', 'label'])
 
 # 필요한 데이터만 변수에 넣음
@@ -17,6 +21,19 @@ start_index = 0
 end_index = 30
 df_len = len(df)
 is_end = False
+
+# 원하는 영상이 있는지 확인
+while (select_video != img_name[start_index][14:22]):
+    start_index += 1
+    if (start_index >= df_len):
+        print('no video')
+        exit()
+
+pre_img_name = img_name[start_index][:22]
+end_index = start_index + 30
+
+if (end_index >= df_len):
+    end_index = df_len-1
 
 # 모든 cvs에 저장된 이미지 출력
 while(start_index < df_len):
