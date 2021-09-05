@@ -14,6 +14,7 @@ class WriteCSV():
         """
         self.path = path
         self.save_path = os.path.join(path, "train.csv")
+        self.save_nokeypoint_path = os.path.join(path, "trains_nokeypoint.csv")
         self.datas = datas
         self.keypoints = keypoints
         self.video_name = video_name
@@ -40,6 +41,7 @@ class WriteCSV():
                 #image_name = self.video_name+ "_image" + str(data[0])
                 wr.writerow(data)
         f.close()
+
     
     def merge_train_csv(self):
         """
@@ -62,6 +64,7 @@ class WriteCSV():
         merge_data = merge_data.drop_duplicates(['image_path'], keep='last').values # 덮어쓰기
         self._write_train_csv(merge_data)
 
+       
 if __name__ == "__main__":
     label_datas = [[0,0.0],[1,1.0],[2,0],[3,1],[4,1],[5,2.0]]
     keypoint_datas = [[470, 369, 515, 621, 124, 579, 0], [33, 369, 5, 621, 124, 579, 0], [1, 359, 5, 621, 124, 579, 0], [33, 3, 5, 621, 124, 579, 0], [8, 6, 5, 621, 124, 579, 0], [2, 369, 5, 621, 124, 579, 0]]
