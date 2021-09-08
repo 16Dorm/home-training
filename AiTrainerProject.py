@@ -1,3 +1,4 @@
+from classification_model.SupervisedLearning import classification
 from math import inf
 import cv2
 import numpy as np
@@ -83,6 +84,7 @@ while True:
             foot = (lmList[28][2])
 
         keypoint = [head, shoulder, elbow, hand, hip, foot, int(elbow_angle), int(hip_angle),int(knee_angle)]  #CSV생성용 키포인트 데이터 생성
+        classification(keypoint)
         keypoint_list.append(keypoint) 
         #k_max, k_min = max(keypoint), min(keypoint)  #최소값, 최대값 이용하지않고 sholder - hand간 거리로 자세 레이블링
         #answer = defineLabel(keypoint, k_max, k_min)   #레이블 구분 함수 (0,1,2)리턴
@@ -91,8 +93,8 @@ while True:
         # 사전에 입력한 시작점과 끝점 외의 준비자세는 레이블을 0으로 둠
         answer = defineLabel(elbow_angle,hip_angle,knee_angle, int(cap.get(cv2.CAP_PROP_POS_FRAMES)), start_sec, end_sec)
         label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가
-
-        print(hip_angle,elbow_angle,knee_angle)
+        
+        # print(hip_angle,elbow_angle,knee_angle)
         #check for the push up curls
         color = (255,0,255)
         if per==100:
@@ -131,6 +133,6 @@ while True:
 #print(f"final_max: {final_max}")
 #print(f"final_min: {final_min}")
 
-print(label_list)
+# print(label_list)
 writecsv = WriteCSV('./train/', label_list, keypoint_list, video_name)
 writecsv.merge_train_csv()
