@@ -56,7 +56,7 @@ class WriteCSV():
             new.append(str(self.path + 'image/' + img_name))
             new.append(int(self.datas[i][1]))
             new_list.append(new)
-            print(new)
+            # print(new)
         new_data = pd.DataFrame(new_list, columns=self.coumns)
 
         merge_data = pd.concat([origin_data, new_data], axis=0) # 합치기

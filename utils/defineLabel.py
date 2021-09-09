@@ -60,7 +60,7 @@ def defineLabel(elbow_angle, hip_angle, knee_angle, frame, start_sec, end_sec):
     #print(frame, start_sec*30, end_sec*30)
     if( frame < start_sec * 30 or frame > end_sec * 30):
         answer = 0
-        print('-')
+        # print('-')
     else:
         if((hip_angle >= 150 and hip_angle <= 210) and (knee_angle >= 145 and knee_angle <=215)):
             if (elbow_angle  > 40 and elbow_angle  <90):
@@ -74,5 +74,5 @@ def defineLabel(elbow_angle, hip_angle, knee_angle, frame, start_sec, end_sec):
                 # print(3)
         else:
             answer=0
-            print(0)
+            # print(0)
     return answer
