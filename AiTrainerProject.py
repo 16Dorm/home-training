@@ -56,12 +56,20 @@ while True:
         # Right Arm
         if lmList[24][1]<lmList[1][1]:
             elbow_angle = detector.findAngle(img, 12,14,16)
+            if (elbow_angle > 180):
+                elbow_angle  = 360 - elbow_angle
             hip_angle= detector.findAngle(img,12,24,26)
             knee_angle= detector.findAngle(img,24,26,28)
+
+            # 그리기
+            detector.drawPoint(img, 12, 14, 16, 'elbow', elbow_angle)
+            detector.drawPoint(img, 12, 24, 26, 'hip', hip_angle)
+            detector.drawPoint(img, 24, 26, 28, 'knee', knee_angle)
+
             # 각도를 퍼센트로 나타내는 코드
-            per = np.interp(elbow_angle, (65, 160), (100, 0))
+            per = np.interp(elbow_angle, (70, 160), (100, 0))
             # print(angle, per)
-            bar = np.interp(elbow_angle, (65, 160), (650, 100))  # 앞에가 최소 뒤에가 최대
+            bar = np.interp(elbow_angle, (70, 160), (650, 100))  # 앞에가 최소 뒤에가 최대
             head = lmList[0][2]
             shoulder = (lmList[11][2])
             elbow = (lmList[13][2])
@@ -72,12 +80,20 @@ while True:
         # Left Arm
         else:
             elbow_angle=detector.findAngle(img, 11, 13, 15)
+            if (elbow_angle > 180):
+                elbow_angle  = 360 - elbow_angle
             hip_angle= detector.findAngle(img,11,23,25)
             knee_angle= detector.findAngle(img,23,25,27)
+
+            # 그리기
+            detector.drawPoint(img, 11, 13, 15, 'elbow', elbow_angle)
+            detector.drawPoint(img, 11, 23, 25, 'hip', hip_angle)
+            detector.drawPoint(img, 23, 25, 27, 'knee', knee_angle)
+
             # 각도를 퍼센트로 나타내는 코드
-            per = np.interp(elbow_angle, (195, 265), (100, 0))
+            per = np.interp(elbow_angle, (70, 160), (100, 0))
             # print(angle, per)
-            bar = np.interp(elbow_angle, (195, 265), (650, 100))  # 앞에가 최소 뒤에가 최대
+            bar = np.interp(elbow_angle, (70, 160), (650, 100))  # 앞에가 최소 뒤에가 최대
             head = (lmList[0][2])
             shoulder = (lmList[12][2])
             elbow = (lmList[14][2])
@@ -114,13 +130,11 @@ while True:
         #draw bar
         cv2.rectangle(img, (1100, 100), (1175, 650), color, 3)
         cv2.rectangle(img, (1100, int(bar)), (1175, 650), color, cv2.FILLED)
-        cv2.putText(img, f'{int(per)} %', (1100, 75), cv2.FONT_HERSHEY_PLAIN, 4,
-                    color, 4)
+        cv2.putText(img, f'{int(per)} %', (1100, 75), cv2.FONT_HERSHEY_PLAIN, 4, color, 4)
 
         #draw curl count
         cv2.rectangle(img, (0,450), (250,720),(0,255,0),cv2.FILLED)
-        cv2.putText(img, str(int(count)), (45,670), cv2.FONT_HERSHEY_PLAIN, 15,
-        (255, 0, 0) ,25)
+        cv2.putText(img, str(int(count)), (45,670), cv2.FONT_HERSHEY_PLAIN, 15, (255, 0, 0) ,25)
 
     cTime = time.time()
     fps = 1/(cTime-pTime)

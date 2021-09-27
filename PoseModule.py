@@ -69,7 +69,7 @@ class poseDetector():
                     # print(id, cx,cy)
         return self.lmList
 
-    def findAngle(self, img, p1, p2, p3, draw=True): #각도 구하는 함수, p1, p2 ,p3를 구해서 각도 구한다
+    def findAngle(self, img, p1, p2, p3, draw=False): #각도 구하는 함수, p1, p2 ,p3를 구해서 각도 구한다
 
         #Get the landmarks
         # == _, x1, y1 = self.lmLIst[p1]
@@ -82,22 +82,47 @@ class poseDetector():
 
         if angle < 0:
             angle += 360
-        # print(angle)
+            
+        return angle     
+
+    def drawPoint(self, img, p1, p2, p3, where, angle, draw=True):
+        x1, y1 = self.lmList[p1][1:]
+        x2, y2 = self.lmList[p2][1:]
+        x3, y3 = self.lmList[p3][1:]
+        
+
+        CircleColor = (0,255,0)
+
+        if where == 'elbow':
+            if angle <= 40 or angle > 180:
+                CircleColor = (0,0,255)
+        elif where == 'hip':
+            if angle < 150 or angle > 210:
+                CircleColor = (0,0,255)
+        elif where == 'knee':
+            if angle < 145 or angle > 215:
+                CircleColor = (0,0,255)
+        else:
+            CircleColor = (0,255,0)
 
         #Draw
         if draw:
-            cv2.line(img, (x1, y1), (x2, y2), (255,255,255),3)
+            cv2.line(img, (x1, y1), (x2, y2), (255,255,255), 3)
             cv2.line(img, (x3, y3), (x2, y2), (255, 255, 255),3)
-            cv2.circle(img, (x1, y1), 10, (0, 0, 255), cv2.FILLED)
-            cv2.circle(img, (x1, y1), 15, (0, 0, 255), 2)
-            cv2.circle(img, (x2, y2), 10, (0, 0, 255), cv2.FILLED)
-            cv2.circle(img, (x2, y2), 15, (0, 0, 255), 2)
-            cv2.circle(img, (x3, y3), 10, (0, 0, 255), cv2.FILLED)
-            cv2.circle(img, (x3, y3), 15, (0, 0, 255), 2)
-            cv2.putText(img, str(int(angle)),(x2 - 50, y2 + 50), #x2를 기준으로 밑에다가 angle값을 써줌
-                        cv2.FONT_HERSHEY_PLAIN,2,(0,0,255),2) #문자열로 바꿔야지 받아들여짐
+            if where == 'elbow':
+                cv2.circle(img, (x1, y1), 10, (0,255,0), cv2.FILLED)
+                cv2.circle(img, (x1, y1), 15, (0,255,0), 2)
 
-        return angle
+            cv2.circle(img, (x2, y2), 10, CircleColor, cv2.FILLED)
+            cv2.circle(img, (x2, y2), 15, CircleColor, 2)
+
+            if where == 'knee' or where == 'elbow':
+                cv2.circle(img, (x3, y3), 10, (0,255,0), cv2.FILLED)
+                cv2.circle(img, (x3, y3), 15, (0,255,0), 2)
+
+            cv2.putText(img, str(int(angle)),(x2 - 50, y2 + 50), #x2를 기준으로 밑에다가 angle값을 써줌
+                        cv2.FONT_HERSHEY_PLAIN,2,CircleColor,2) #문자열로 바꿔야지 받아들여짐
+        return
 
 def main():
     cap = cv2.VideoCapture(m_name + '.mp4')
