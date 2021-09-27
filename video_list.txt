@@ -1,5 +1,7 @@
-pushup_0 0 0
-pushup_1 7 41
-pushup_2 4 41
-pushup_3 0 0
-pushup_4 7 26
+pushup_00 0 0
+pushup_01 7 41
+pushup_02 4 41
+pushup_03 0 0
+pushup_04 7 26
+pushup_10 8 44
+pushup_11 7 33

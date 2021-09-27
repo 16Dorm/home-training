@@ -22,6 +22,7 @@ class WriteCSV():
 
         if not os.path.exists(self.save_path):
             self._make_train_csv()
+            print('-- 파일이 없어서 csv를 생성했습니다. --')
 
     def _make_train_csv(self):
         """
