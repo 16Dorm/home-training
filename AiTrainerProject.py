@@ -67,9 +67,9 @@ while True:
             detector.drawPoint(img, 24, 26, 28, 'knee', knee_angle)
 
             # 각도를 퍼센트로 나타내는 코드
-            per = np.interp(elbow_angle, (70, 160), (100, 0))
+            per = np.interp(elbow_angle, (80, 160), (100, 0))
             # print(angle, per)
-            bar = np.interp(elbow_angle, (70, 160), (650, 100))  # 앞에가 최소 뒤에가 최대
+            bar = np.interp(elbow_angle, (80, 160), (650, 100))  # 앞에가 최소 뒤에가 최대
             head = lmList[0][2]
             shoulder = (lmList[11][2])
             elbow = (lmList[13][2])
@@ -91,9 +91,9 @@ while True:
             detector.drawPoint(img, 23, 25, 27, 'knee', knee_angle)
 
             # 각도를 퍼센트로 나타내는 코드
-            per = np.interp(elbow_angle, (70, 160), (100, 0))
+            per = np.interp(elbow_angle, (80, 160), (100, 0))
             # print(angle, per)
-            bar = np.interp(elbow_angle, (70, 160), (650, 100))  # 앞에가 최소 뒤에가 최대
+            bar = np.interp(elbow_angle, (80, 160), (650, 100))  # 앞에가 최소 뒤에가 최대
             head = (lmList[0][2])
             shoulder = (lmList[12][2])
             elbow = (lmList[14][2])

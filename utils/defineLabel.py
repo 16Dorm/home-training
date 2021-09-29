@@ -53,8 +53,8 @@ def defineLabel(elbow_angle, hip_angle, knee_angle, frame, start_sec, end_sec):
     무릎 180-210
     """
     
-    if (elbow_angle > 180):
-        elbow_angle  = 360 - elbow_angle 
+    #if (elbow_angle > 180):
+    #    elbow_angle  = 360 - elbow_angle 
 
     answer = None
     #print(frame, start_sec*30, end_sec*30)
