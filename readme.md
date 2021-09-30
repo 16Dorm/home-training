@@ -16,12 +16,16 @@ Embedded System Engineering Capstone Design Project Repository
 - MediaPipe == 0.8.2
 - OpenCV == 4.5.3
 - numpy == 1.19.3
+- sklearn == 1.0
+- pandas == 1.3.3
 
 ```shel
 conda create -n home-training python=3.8
 conda activate home-training
 
 pip install mediapipe==0.8.2
+pip install sklearn
+pip install pandas
 ```
 
   
