@@ -10,8 +10,8 @@ class classification():
     
     def train_csv(self):
         global model
-        df_train=pd.read_csv("./train/test.csv", names=["head","shoulder","elbow","hand","hip","foot","elbow_angle","hip_angle","knee_angle","path","label"]) #학습 데이터들
-        df_test=pd.read_csv("./train/train.csv",names=["head","shoulder","elbow","hand","hip","foot","elbow_angle","hip_angle","knee_angle","path","label"]) #실시간 데이터
+        df_train=pd.read_csv("./train/train.csv", names=["head","shoulder","elbow","hand","hip","foot","elbow_angle","hip_angle","knee_angle","path","label"]) #학습 데이터들
+        df_test=pd.read_csv("./train/test.csv",names=["head","shoulder","elbow","hand","hip","foot","elbow_angle","hip_angle","knee_angle","path","label"]) #실시간 데이터
 
         #train 데이터
         x=df_train.drop(columns=['path','label'])
