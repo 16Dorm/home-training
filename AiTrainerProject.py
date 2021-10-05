@@ -48,6 +48,7 @@ while True:
     img = detector.findPose(img, black_img, index, False) #false를 해서 우리가 보고자하는 점 외에는 다 제거
     index+=1
     lmList = detector.findPosition(img, False) #그리기를 원하지 않으므로 false
+    per = 0
     # print(lmList) #좌표를 프린트
     keypoint = [] # 핵심 키포인트를 담을 리스트
     if len(lmList)!=0:
