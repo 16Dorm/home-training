@@ -132,7 +132,8 @@ while True:
         #cv2.rectangle(img, (1100, int(bar)), (1175, 650), color, cv2.FILLED)
         #cv2.putText(img, f'{int(per)} %', (1100, 75), cv2.FONT_HERSHEY_PLAIN, 4, color, 4)
         
-        
+        if(per == 100):
+            img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (190, 250, 0), 15, 2)
         elif(per != 0):
             img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (255, 190, 0), 15, 2)
         
