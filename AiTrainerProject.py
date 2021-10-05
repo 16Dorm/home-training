@@ -128,18 +128,19 @@ while True:
         #print(f"count: {count}")
         #print(f"index: {index}")
         #draw bar
-        #cv2.rectangle(img, (1100, 100), (1175, 650), color, 3)
-        #cv2.rectangle(img, (1100, int(bar)), (1175, 650), color, cv2.FILLED)
-        #cv2.putText(img, f'{int(per)} %', (1100, 75), cv2.FONT_HERSHEY_PLAIN, 4, color, 4)
-        
+
         if(per == 100):
             img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (190, 250, 0), 15, 2)
         elif(per != 0):
             img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (255, 190, 0), 15, 2)
         
         #draw curl count
-        #cv2.rectangle(img, (0,450), (250,720),(0,255,0),cv2.FILLED)
         cv2.putText(img, str(int(count)), (1053,650), cv2.FONT_HERSHEY_PLAIN, 10, (255, 0, 0), 15)
+
+        if(count == 10):
+            img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (30, 30, 255), 10, 2)
+        elif(int(count) != 0):
+            img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (90, 90, 255), 10, 2)
 
     cTime = time.time()
     fps = 1/(cTime-pTime)
