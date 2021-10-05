@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import time
 import PoseModule as pm
+from utils.add_Pictogram import add_Pictogram
 from utils.defineLabel import defineLabel
 from utils.WriteCSV import WriteCSV
 
@@ -127,7 +128,7 @@ while True:
                 dir = 0
         #print(f"count: {count}")
         #print(f"index: {index}")
-        
+
         #draw bar
         if(per == 100):
             img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (150, 250, 0), 15, 2)
@@ -146,10 +147,12 @@ while True:
         elif(int(count) >= 10):
             img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (30, 30, 255), 10, 2)
 
+
     cTime = time.time()
     fps = 1/(cTime-pTime)
     pTime = cTime
     cv2.putText(img, str(int(fps)), (50, 100), cv2.FONT_HERSHEY_PLAIN, 5, (255, 0, 0), 5)
+    img = add_Pictogram(img, int(per/34))
     cv2.imshow("Image",img)
     cv2.waitKey(1)
 
