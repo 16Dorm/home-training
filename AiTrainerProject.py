@@ -130,12 +130,12 @@ while True:
         #draw bar
 
         if(per == 100):
-            img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (190, 250, 0), 15, 2)
+            img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (150, 250, 0), 15, 2)
         elif(per != 0):
             img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (255, 190, 0), 15, 2)
         
         #draw curl count
-        cv2.putText(img, str(int(count)), (1053,650), cv2.FONT_HERSHEY_PLAIN, 10, (255, 0, 0), 15)
+        cv2.putText(img, str(int(count)), (1053,650), cv2.FONT_HERSHEY_PLAIN, 10, (180, 50, 50), 15)
 
         if(count == 10):
             img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (30, 30, 255), 10, 2)
@@ -145,7 +145,7 @@ while True:
     cTime = time.time()
     fps = 1/(cTime-pTime)
     pTime = cTime
-    #cv2.putText(img, str(int(fps)), (50, 100), cv2.FONT_HERSHEY_PLAIN, 5, (255, 0, 0), 5)
+    cv2.putText(img, str(int(fps)), (50, 100), cv2.FONT_HERSHEY_PLAIN, 5, (255, 0, 0), 5)
     cv2.imshow("Image",img)
     cv2.waitKey(1)
 
