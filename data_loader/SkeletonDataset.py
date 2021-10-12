@@ -20,6 +20,7 @@ class SkeletonDataset(Dataset):
         image = Image.open(self.df['image_path'].iloc[index])
         image = np.array(image.convert("RGB"))
         if self.transform:
-            transformed_image = self.transform(image=image)['image']
+            
+            transformed_image = self.transform(image=image)#['image']
             image = transformed_image['image']
         return image, label

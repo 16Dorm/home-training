@@ -1,7 +1,6 @@
 import os
-
+from .SkeletonDataset import SkeletonDataset
 import pandas as pd
-from datasets import SkeletonDataset
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 
@@ -15,10 +14,11 @@ class SkeletonDataLoader():
         self.eval_dir = os.path.join(self.data_dir, 'eval')
 
         csv_path=os.path.join(self.train_dir, "train.csv")
+        print(csv_path)
         self.df = pd.read_csv(csv_path, names=self.columns)
 
-        self.dataset = SkeletonDataset(self.df)
-        self.train_dataset, self.valid_dataset = train_test_split(self.dataset, test_size=validation_split, random_state=42, stratify=self.df.to_numpy()[:,-1])
+        self.data = SkeletonDataset(self.df, trsfm)
+        self.train_dataset, self.valid_dataset = train_test_split(self.data, test_size=validation_split, random_state=42, stratify=self.df.to_numpy()[:,-1])
 
         self.train_dataloader = DataLoader(self.train_dataset, batch_size, num_workers, pin_memory=True)
         self.valid_dataloader = DataLoader(self.valid_dataset, batch_size, num_workers, pin_memory=True)

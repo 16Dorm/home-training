@@ -3,6 +3,8 @@ __pycache__
 *.pyc
 *.mp4
 image/
+wandb/
+
 video_name.txt
 
 # 테스트 파일
