@@ -1,3 +1,4 @@
+from albumentations.core.serialization import save
 import numpy as np
 import pandas as pd
 import torch
@@ -10,12 +11,16 @@ import timm
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from tqdm import tqdm
+import copy
+import os
 # import wandb
 # wandb.login()
 
 # 1. 데이터 경로 및 하이퍼파라미터
 dataset_dir = './'
+save_dir = './results/'
 MODEL_NAME = "efficientnet_b0"
+num_workers = 0
 learning_rate = 2e-5
 batch_size = 64
 step_size = 5
@@ -23,7 +28,7 @@ epochs = 20
 early_stop =5
 
 A_transforms = A.Compose([
-                    A.Resize(512, 512),
+                    A.Resize(224, 224),
                     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
                     ToTensorV2()
                 ])
@@ -62,13 +67,12 @@ criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), learning_rate)
 lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=50, eta_min=0)
 
-dataloader = SkeletonDataLoader(dataset_dir, batch_size=64, trsfm=A_transforms)
+dataloader = SkeletonDataLoader(dataset_dir, batch_size=batch_size, trsfm=A_transforms, num_workers=num_workers)
 train_loader, valid_loader = dataloader.split_validation()
 
 calc_train_acc = torchmetrics.Accuracy()
 calc_train_f1 = torchmetrics.F1(num_classes=4)
 calc_valid_acc = torchmetrics.Accuracy()
-
 
 # wandb.init(project="Home-Training", entity='nudago')
 # wandb_config = wandb.config
@@ -77,58 +81,76 @@ calc_valid_acc = torchmetrics.Accuracy()
 # wandb_config.step_size = step_size
 # wandb_config.epochs = epochs
 
+# 5. 학습
+def train():
+    best_loss = 999999999
+    for epoch in range(epochs):
+        model.train()
+        running_loss = 0.0
+        with tqdm(train_loader, total=train_loader.__len__(), unit="batch") as train_bar:
+            for batch_idx, (inputs, labels) in enumerate(train_bar):
+                example_ct = epoch * (len(train_loader)) + batch_idx
+                train_bar.set_description(f"Train Epoch: {epoch}")
 
-for epoch in range(epochs):
-    model.train()
-    running_loss = 0.0
-    with tqdm(train_loader, total=train_loader.__len__(), unit="batch") as train_bar:
-        for batch_idx, (inputs, labels) in enumerate(train_bar):
-            example_ct = epoch * (len(train_loader)) + batch_idx
-            train_bar.set_description(f"Train Epoch: {epoch}")
+                inputs, labels = inputs.to(device), labels.to(device)
+                optimizer.zero_grad()
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+                loss.backward()
+                optimizer.step()
 
-            inputs, labels = inputs.to(device), labels.to(device)
-            optimizer.zero_grad()
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
+                outputs = outputs.cpu().detach()
+                labels = labels.cpu().detach()
 
-            outputs = outputs.cpu().detach()
-            labels = labels.cpu().detach()
+                running_loss += loss.item() * inputs.size(0)
+                epoch_loss = running_loss / len(train_loader)
 
-            running_loss += loss.item() * inputs.size(0)
-            epoch_loss = running_loss / len(train_loader)
+                train_acc = calc_train_acc(outputs.argmax(1), labels)
+                train_f1 = calc_train_f1(outputs.argmax(1), labels)
 
-            train_acc = calc_train_acc(outputs.argmax(1), labels)
-            train_f1 = calc_train_f1(outputs.argmax(1), labels)
+                train_bar.set_postfix(loss=epoch_loss, acc=train_acc.item(), f1=train_f1.item())
+                # wandb.log({'train_loss':loss.item(), 'train_acc':train_acc}, step=example_ct)
+        lr_scheduler.step()
 
-            train_bar.set_postfix(loss=epoch_loss, acc=train_acc, f1=train_f1)
-            # wandb.log({'train_loss':loss.item(), 'train_acc':train_acc}, step=example_ct)
-    lr_scheduler.step()
+        model.eval()
+        running_loss=0.0
+        with tqdm(valid_loader, total=valid_loader.__len__(), unit='batch') as valid_bar:
+            for batch_idx, (inputs, labels) in enumerate(train_bar):
+                valid_bar.set_description(f"Vrain Epoch: {epoch}")
 
-    model.eval()
-    running_loss=0.0
-    with tqdm(valid_loader, total=valid_loader.__len__(), unit='batch') as valid_bar:
-        for batch_idx, (inputs, labels) in enumerate(train_bar):
-            valid_bar.set_description(f"Vrain Epoch: {epoch}")
+                inputs, labels = inputs.to(device), labels.to(device)
+                optimizer.zero_grad()
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
 
-            inputs, labels = inputs.to(device), labels.to(device)
-            optimizer.zero_grad()
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
+                outputs = outputs.cpu().detach()
+                labels = labels.cpu().detach()
 
-            outputs = outputs.cpu().detach()
-            labels = labels.cpu().detach()
+                running_loss += loss.item() * inputs.size(0)
+                epoch_loss = running_loss / len(train_loader)
 
-            running_loss += loss.item() * inputs.size(0)
-            epoch_loss = running_loss / len(train_loader)
+                valid_acc = calc_valid_acc(outputs.argmax(1), labels)
+                valid_bar.set_postfix(loss=epoch_loss, acc=valid_acc.item())
 
-            valid_acc = calc_valid_acc(outputs.argmax(1), labels)
-            valid_bar.set_postfix(loss=epoch_loss, acc=valid_acc.compute())
-    # wandb.log({'valid_loss':epoch_loss, 'train_acc':calc_valid_acc.compute()}, step=example_ct)
+            if epoch_loss < best_loss:
+                best_loss = epoch_loss
+                best_model = copy.deepcopy(model.state_dict())
+                torch.save(best_model, f'{save_dir}{MODEL_NAME}/{MODEL_NAME}_lr{learning_rate}_batch{batch_size}_epoch{epoch}_valid_loss{epoch_loss:.5f}.pt')
+                early_stop_value =0
+            else:
+                early_stop_value += 1
 
+        # wandb.log({'valid_loss':epoch_loss, 'train_acc':calc_valid_acc.compute()}, step=example_ct)
 
-# 6. 추론5
-if __name__ == "__main__":
-    #df_train = Load_CSV(train_dir)
+# 6. 추론
+def eval():
     pass
+
+
+if __name__ == '__main__':
+
+    if not os.path.exists(f'{save_dir}{MODEL_NAME}'): # save_dir폴더 생성
+        os.mkdir(f'{save_dir}{MODEL_NAME}')
+    
+    train() # 학습
+    eval() # 추론

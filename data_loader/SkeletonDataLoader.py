@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 
 
 class SkeletonDataLoader():
-    def __init__(self, data_dir, batch_size, shffule=True, validation_split=0.1, num_workers=1, trsfm=None):
+    def __init__(self, data_dir, batch_size, num_workers, shuffle=True, validation_split=0.1, trsfm=None):
         self.columns = ["head", "shoulder", "elbow", "hand", "hip", "foot", "elbow_angle", "hip_angle", "knee_angle", "image_path", "label"]
 
         self.data_dir = data_dir
@@ -20,8 +20,8 @@ class SkeletonDataLoader():
         self.data = SkeletonDataset(self.df, trsfm)
         self.train_dataset, self.valid_dataset = train_test_split(self.data, test_size=validation_split, random_state=42, stratify=self.df.to_numpy()[:,-1])
 
-        self.train_dataloader = DataLoader(self.train_dataset, batch_size, num_workers, pin_memory=True)
-        self.valid_dataloader = DataLoader(self.valid_dataset, batch_size, num_workers, pin_memory=True)
+        self.train_dataloader = DataLoader(self.train_dataset, batch_size, shuffle=shuffle, num_workers=num_workers, pin_memory=True)
+        self.valid_dataloader = DataLoader(self.valid_dataset, batch_size, shuffle=shuffle, num_workers=num_workers, pin_memory=True)
 
         #assert trsfm is not None, "Set the transform on train set"
 
