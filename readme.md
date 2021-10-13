@@ -28,6 +28,12 @@ pip install sklearn
 pip install pandas
 ```
 
+```
+pip install -U albumentations
+pip install torchmetrics
+pip install tqdm
+pip install timm
+```
   
 
 ## Folder Structure
