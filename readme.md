@@ -29,10 +29,13 @@ pip install pandas
 ```
 
 ```
+# for ImageClassfication.py
 pip install -U albumentations
 pip install torchmetrics
 pip install tqdm
 pip install timm
+pip uninstall opencv-python 
+pip install opencv-python
 ```
   
 
