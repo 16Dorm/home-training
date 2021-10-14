@@ -5,3 +5,8 @@ pushup_03 0 0
 pushup_04 7 26
 pushup_10 8 44
 pushup_11 7 33
+pushup_13 0 18
+pushup_14 8 28
+pushup_15 6 27
+pushup_16 5 29
+pushup_20 0 17
