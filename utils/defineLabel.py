@@ -72,6 +72,8 @@ def defineLabel(elbow_angle, hip_angle, knee_angle, frame, start_sec, end_sec):
             elif(elbow_angle >=140 and elbow_angle  < 180):
                 answer=3
                 # print(3)
+            else:
+                answer=0
         else:
             answer=0
             # print(0)
