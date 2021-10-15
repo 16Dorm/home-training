@@ -13,22 +13,22 @@ from albumentations.pytorch import ToTensorV2
 from tqdm import tqdm
 import copy
 import os
-# import wandb
-# wandb.login()
+import wandb
+wandb.login()
 
 # 1. 데이터 경로 및 하이퍼파라미터
-dataset_dir = './'
+dataset_dir = './dataset'
 save_dir = './results/'
-MODEL_NAME = "efficientnet_b0"
+MODEL_NAME = "efficientnet_b5"
 num_workers = 0
-learning_rate = 2e-5
-batch_size = 64
+learning_rate = 1e-4
+batch_size = 8
 step_size = 5
-epochs = 20
+epochs = 60
 early_stop =5
 
 A_transforms = A.Compose([
-                    A.Resize(224, 224),
+                    A.Resize(300, 300),
                     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
                     ToTensorV2()
                 ])
@@ -65,21 +65,22 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = EfficientNet(MODEL_NAME, num_classes=4).to(device)
 criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), learning_rate)
-lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=50, eta_min=0)
+lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=20, eta_min=0)
 
-dataloader = SkeletonDataLoader(dataset_dir, batch_size=batch_size, trsfm=A_transforms, num_workers=num_workers)
+dataloader = SkeletonDataLoader(dataset_dir, batch_size=batch_size, trsfm=A_transforms, num_worker=num_workers)
 train_loader, valid_loader = dataloader.split_validation()
 
 calc_train_acc = torchmetrics.Accuracy()
 calc_train_f1 = torchmetrics.F1(num_classes=4)
 calc_valid_acc = torchmetrics.Accuracy()
 
-# wandb.init(project="Home-Training", entity='nudago')
-# wandb_config = wandb.config
-# wandb_config.learning_rate = learning_rate
-# wandb_config.batch_size = batch_size
-# wandb_config.step_size = step_size
-# wandb_config.epochs = epochs
+wandb.init(project="Home-Training", entity='nudago')
+wandb_config = wandb.config
+wandb_config.learning_rate = learning_rate
+wandb_config.batch_size = batch_size
+wandb_config.step_size = step_size
+wandb_config.epochs = epochs
+
 
 # 5. 학습
 def train():
@@ -109,14 +110,14 @@ def train():
                 train_f1 = calc_train_f1(outputs.argmax(1), labels)
 
                 train_bar.set_postfix(loss=epoch_loss, acc=train_acc.item(), f1=train_f1.item())
-                # wandb.log({'train_loss':loss.item(), 'train_acc':train_acc}, step=example_ct)
+                #print(float(lr_scheduler.get_last_lr()[0]))
+                wandb.log({'train_loss':loss.item(), 'train_acc':train_acc, 'learning_rate':float(lr_scheduler.get_last_lr()[0])}, step=example_ct)
         lr_scheduler.step()
-
         model.eval()
         running_loss=0.0
         with tqdm(valid_loader, total=valid_loader.__len__(), unit='batch') as valid_bar:
-            for batch_idx, (inputs, labels) in enumerate(train_bar):
-                valid_bar.set_description(f"Vrain Epoch: {epoch}")
+            for batch_idx, (inputs, labels) in enumerate(valid_bar):
+                valid_bar.set_description(f"Valid Epoch: {epoch}")
 
                 inputs, labels = inputs.to(device), labels.to(device)
                 optimizer.zero_grad()
@@ -126,8 +127,8 @@ def train():
                 outputs = outputs.cpu().detach()
                 labels = labels.cpu().detach()
 
-                running_loss += loss.item() * inputs.size(0)
-                epoch_loss = running_loss / len(train_loader)
+                running_loss += loss.item()# * inputs.size(0)
+                epoch_loss = running_loss / len(valid_loader)
 
                 valid_acc = calc_valid_acc(outputs.argmax(1), labels)
                 valid_bar.set_postfix(loss=epoch_loss, acc=valid_acc.item())
@@ -139,8 +140,7 @@ def train():
                 early_stop_value =0
             else:
                 early_stop_value += 1
-
-        # wandb.log({'valid_loss':epoch_loss, 'train_acc':calc_valid_acc.compute()}, step=example_ct)
+        wandb.log({'valid_loss':epoch_loss, 'valid_acc':calc_valid_acc.compute()}, step=example_ct+1)
 
 # 6. 추론
 def eval():
@@ -148,9 +148,8 @@ def eval():
 
 
 if __name__ == '__main__':
-
     if not os.path.exists(f'{save_dir}{MODEL_NAME}'): # save_dir폴더 생성
-        os.mkdir(f'{save_dir}{MODEL_NAME}')
+        os.makedirs(f'{save_dir}{MODEL_NAME}')
     
     train() # 학습
     eval() # 추론
