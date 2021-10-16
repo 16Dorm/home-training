@@ -19,7 +19,7 @@ wandb.login()
 # 1. 데이터 경로 및 하이퍼파라미터
 dataset_dir = './dataset'
 save_dir = './results/'
-MODEL_NAME = "efficientnet_b5"
+MODEL_NAME = "efficientnet_b0"
 num_workers = 0
 learning_rate = 1e-4
 batch_size = 8
@@ -29,16 +29,10 @@ early_stop =5
 
 A_transforms = A.Compose([
                     A.Resize(300, 300),
-                    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                    #A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                    A.Normalize(mean=[1.0462, 2.4636, 0.4279], std=[12.2819, 22.4455,  3.6525]),
                     ToTensorV2()
                 ])
-
-# 2. 데이터 로더
-class Load_CSV():
-    """CSV데이터를 불러와 """
-    def __init__(self, dir):
-        self.df = pd.read_csv(dir, names=["head", "shoulder", "elbow", "hand", "hip", "foot", "elbow_angle", "hip_angle", "knee_angle", "image_path", "label"])
-        self.df = self.df[['image_path','label']]
 
 
 # 3. 모델 선언 (timm)
@@ -133,13 +127,13 @@ def train():
                 valid_acc = calc_valid_acc(outputs.argmax(1), labels)
                 valid_bar.set_postfix(loss=epoch_loss, acc=valid_acc.item())
 
-            if epoch_loss < best_loss:
-                best_loss = epoch_loss
-                best_model = copy.deepcopy(model.state_dict())
-                torch.save(best_model, f'{save_dir}{MODEL_NAME}/{MODEL_NAME}_lr{learning_rate}_batch{batch_size}_epoch{epoch}_valid_loss{epoch_loss:.5f}.pt')
-                early_stop_value =0
-            else:
-                early_stop_value += 1
+            #if epoch_loss < best_loss:
+            best_loss = epoch_loss
+            best_model = copy.deepcopy(model.state_dict())
+            torch.save(best_model, f'{save_dir}{MODEL_NAME}/{MODEL_NAME}_lr{learning_rate}_batch{batch_size}_epoch{epoch}_valid_loss{epoch_loss:.5f}.pt')
+            early_stop_value =0
+            #else:
+            #    early_stop_value += 1
         wandb.log({'valid_loss':epoch_loss, 'valid_acc':calc_valid_acc.compute()}, step=example_ct+1)
 
 # 6. 추론
