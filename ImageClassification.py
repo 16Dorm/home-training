@@ -13,8 +13,10 @@ from albumentations.pytorch import ToTensorV2
 from tqdm import tqdm
 import copy
 import os
+import random
 import wandb
 wandb.login()
+
 
 # 1. 데이터 경로 및 하이퍼파라미터
 dataset_dir = './dataset'
@@ -26,14 +28,23 @@ batch_size = 8
 step_size = 5
 epochs = 60
 early_stop =5
+seed = 2021
 
 A_transforms = A.Compose([
                     A.Resize(300, 300),
-                    #A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-                    A.Normalize(mean=[1.0462, 2.4636, 0.4279], std=[12.2819, 22.4455,  3.6525]),
+                    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                    #A.Normalize(mean=[1.0462, 2.4636, 0.4279], std=[12.2819, 22.4455,  3.6525]),
                     ToTensorV2()
                 ])
 
+# 2. 시드 고정
+torch.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)  # if use multi-GPU
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+np.random.seed(seed)
+random.seed(seed)
 
 # 3. 모델 선언 (timm)
 class EfficientNet(torch.nn.Module):
