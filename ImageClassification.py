@@ -1,10 +1,13 @@
+from albumentations.augmentations.transforms import HorizontalFlip
 from albumentations.core.serialization import save
 import numpy as np
 import pandas as pd
 import torch
 
 from data_loader.SkeletonDataset import SkeletonDataset
-from data_loader.SkeletonDataLoader import SkeletonDataLoader
+from data_loader.SkeletonCSV import SkeletonCSV
+from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader
 
 import torchmetrics
 import timm
@@ -30,13 +33,21 @@ epochs = 60
 early_stop =5
 seed = 2021
 
-A_transforms = A.Compose([
+A_transforms = {
+    'train' : A.Compose([
                     A.Resize(300, 300),
+                    A.RandomCrop(224, 224),
+                    A.HorizontalFlip(p=0.5),
                     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
                     #A.Normalize(mean=[1.0462, 2.4636, 0.4279], std=[12.2819, 22.4455,  3.6525]),
                     ToTensorV2()
+                ]),
+    'valid' : A.Compose([
+                    A.Resize(224, 224),
+                    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                    ToTensorV2()
                 ])
-
+}
 # 2. 시드 고정
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
@@ -72,8 +83,13 @@ criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), learning_rate)
 lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=20, eta_min=0)
 
-dataloader = SkeletonDataLoader(dataset_dir, batch_size=batch_size, trsfm=A_transforms, num_worker=num_workers)
-train_loader, valid_loader = dataloader.split_validation()
+skeleton_csv = SkeletonCSV(dataset_dir)
+train_dataset, valid_dataset = train_test_split(skeleton_csv.df, test_size=0.2, random_state=42, stratify=skeleton_csv.df.to_numpy()[:,-1])
+
+train_dataset = SkeletonDataset(train_dataset, transform=A_transforms['train'])
+valid_dataset = SkeletonDataset(train_dataset, transform=A_transforms['valid'])
+train_loader = DataLoader(train_dataset, batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
+valid_loader = DataLoader(valid_dataset, batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
 
 calc_train_acc = torchmetrics.Accuracy()
 calc_train_f1 = torchmetrics.F1(num_classes=4)
