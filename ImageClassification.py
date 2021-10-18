@@ -87,7 +87,7 @@ skeleton_csv = SkeletonCSV(dataset_dir)
 train_dataset, valid_dataset = train_test_split(skeleton_csv.df, test_size=0.2, random_state=42, stratify=skeleton_csv.df.to_numpy()[:,-1])
 
 train_dataset = SkeletonDataset(train_dataset, transform=A_transforms['train'])
-valid_dataset = SkeletonDataset(train_dataset, transform=A_transforms['valid'])
+valid_dataset = SkeletonDataset(valid_dataset, transform=A_transforms['valid'])
 train_loader = DataLoader(train_dataset, batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
 valid_loader = DataLoader(valid_dataset, batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
 
