@@ -24,7 +24,7 @@ wandb.login()
 # 1. 데이터 경로 및 하이퍼파라미터
 dataset_dir = './dataset'
 save_dir = './results/'
-MODEL_NAME = "efficientnet_b0"
+MODEL_NAME = "efficientnet_b1"
 num_workers = 0
 learning_rate = 1e-4
 batch_size = 8
@@ -35,15 +35,15 @@ seed = 2021
 
 A_transforms = {
     'train' : A.Compose([
-                    A.Resize(300, 300),
-                    A.RandomCrop(224, 224),
+                    A.Resize(250, 250),
+                    A.RandomCrop(240, 240),
                     A.HorizontalFlip(p=0.5),
                     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
                     #A.Normalize(mean=[1.0462, 2.4636, 0.4279], std=[12.2819, 22.4455,  3.6525]),
                     ToTensorV2()
                 ]),
     'valid' : A.Compose([
-                    A.Resize(224, 224),
+                    A.Resize(240, 240),
                     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
                     ToTensorV2()
                 ])
