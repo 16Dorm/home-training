@@ -4,6 +4,7 @@ __pycache__
 *.mp4
 image/
 wandb/
+results/
 
 video_name.txt
 

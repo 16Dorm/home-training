@@ -1,10 +1,13 @@
+from albumentations.augmentations.transforms import HorizontalFlip
 from albumentations.core.serialization import save
 import numpy as np
 import pandas as pd
 import torch
 
 from data_loader.SkeletonDataset import SkeletonDataset
-from data_loader.SkeletonDataLoader import SkeletonDataLoader
+from data_loader.SkeletonCSV import SkeletonCSV
+from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader
 
 import torchmetrics
 import timm
@@ -13,33 +16,46 @@ from albumentations.pytorch import ToTensorV2
 from tqdm import tqdm
 import copy
 import os
+import random
 import wandb
 wandb.login()
+
 
 # 1. 데이터 경로 및 하이퍼파라미터
 dataset_dir = './dataset'
 save_dir = './results/'
-MODEL_NAME = "efficientnet_b5"
+MODEL_NAME = "efficientnet_b1"
 num_workers = 0
 learning_rate = 1e-4
 batch_size = 8
 step_size = 5
 epochs = 60
 early_stop =5
+seed = 2021
 
-A_transforms = A.Compose([
-                    A.Resize(300, 300),
+A_transforms = {
+    'train' : A.Compose([
+                    A.Resize(250, 250),
+                    A.RandomCrop(240, 240),
+                    A.HorizontalFlip(p=0.5),
+                    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                    #A.Normalize(mean=[1.0462, 2.4636, 0.4279], std=[12.2819, 22.4455,  3.6525]),
+                    ToTensorV2()
+                ]),
+    'valid' : A.Compose([
+                    A.Resize(240, 240),
                     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
                     ToTensorV2()
                 ])
-
-# 2. 데이터 로더
-class Load_CSV():
-    """CSV데이터를 불러와 """
-    def __init__(self, dir):
-        self.df = pd.read_csv(dir, names=["head", "shoulder", "elbow", "hand", "hip", "foot", "elbow_angle", "hip_angle", "knee_angle", "image_path", "label"])
-        self.df = self.df[['image_path','label']]
-
+}
+# 2. 시드 고정
+torch.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)  # if use multi-GPU
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+np.random.seed(seed)
+random.seed(seed)
 
 # 3. 모델 선언 (timm)
 class EfficientNet(torch.nn.Module):
@@ -67,8 +83,13 @@ criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), learning_rate)
 lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=20, eta_min=0)
 
-dataloader = SkeletonDataLoader(dataset_dir, batch_size=batch_size, trsfm=A_transforms, num_worker=num_workers)
-train_loader, valid_loader = dataloader.split_validation()
+skeleton_csv = SkeletonCSV(dataset_dir)
+train_dataset, valid_dataset = train_test_split(skeleton_csv.df, test_size=0.2, random_state=42, stratify=skeleton_csv.df.to_numpy()[:,-1])
+
+train_dataset = SkeletonDataset(train_dataset, transform=A_transforms['train'])
+valid_dataset = SkeletonDataset(valid_dataset, transform=A_transforms['valid'])
+train_loader = DataLoader(train_dataset, batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
+valid_loader = DataLoader(valid_dataset, batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
 
 calc_train_acc = torchmetrics.Accuracy()
 calc_train_f1 = torchmetrics.F1(num_classes=4)
@@ -133,13 +154,13 @@ def train():
                 valid_acc = calc_valid_acc(outputs.argmax(1), labels)
                 valid_bar.set_postfix(loss=epoch_loss, acc=valid_acc.item())
 
-            if epoch_loss < best_loss:
-                best_loss = epoch_loss
-                best_model = copy.deepcopy(model.state_dict())
-                torch.save(best_model, f'{save_dir}{MODEL_NAME}/{MODEL_NAME}_lr{learning_rate}_batch{batch_size}_epoch{epoch}_valid_loss{epoch_loss:.5f}.pt')
-                early_stop_value =0
-            else:
-                early_stop_value += 1
+            #if epoch_loss < best_loss:
+            best_loss = epoch_loss
+            best_model = copy.deepcopy(model.state_dict())
+            torch.save(best_model, f'{save_dir}{MODEL_NAME}/{MODEL_NAME}_lr{learning_rate}_batch{batch_size}_epoch{epoch}_valid_loss{epoch_loss:.5f}.pt')
+            early_stop_value =0
+            #else:
+            #    early_stop_value += 1
         wandb.log({'valid_loss':epoch_loss, 'valid_acc':calc_valid_acc.compute()}, step=example_ct+1)
 
 # 6. 추론
