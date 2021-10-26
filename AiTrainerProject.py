@@ -1,3 +1,4 @@
+from numpy.core import fromnumeric
 from classification_model.SupervisedLearning import classification
 from math import inf
 import cv2
@@ -24,15 +25,32 @@ def run_pose_estimation(video_name):
                     end_sec = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
                 break
 
-    detector =pm.poseDetector(video_name)
+    # count를 위한 변수
+    labels_table = [3,2,1,2]
+    pre_label = -1
+    cur_label = -1
+    prediction = 3
+    counting_idx = 0
+    semi_count = 0
+
+
     count = 0
+
+    # 나중엔 안씀ㅋㅋ
     dir = 0
+    
+    # 프레임 확인을 위한 변수
     pTime = 0
+
+
     index = 0
     label_list = []
     keypoint_list = []
     #class_var=classification()
     #class_var.train_csv()
+    
+    detector =pm.poseDetector(video_name)
+
     while True:
         success, img =cap.read()
         if not success:
@@ -111,8 +129,27 @@ def run_pose_estimation(video_name):
             answer = defineLabel(int(elbow_angle), int(hip_angle), int(knee_angle), int(cap.get(cv2.CAP_PROP_POS_FRAMES)), int(start_sec), int(end_sec))
             label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가
             
-            # print(hip_angle,elbow_angle,knee_angle)
-            #check for the push up curls
+            
+            # 카운트 확인
+            '''
+            # cur_label = BKs_func()
+            if pre_label != cur_label:
+                if cur_label == prediction:
+                    if semi_count == 4:
+                        count += 1
+
+                    semi_count = (semi_count+1) % 5
+                    counting_idx += 1
+                    prediction = labels_table[(counting_idx) % 4]
+
+                else:
+                    semi_count = 0
+                    counting_idx = 0
+                    prediction = 3
+
+            pre_label = cur_label
+            '''
+
             color = (255,0,255)
             if per==100:
                 color = (0, 255, 0)
@@ -124,8 +161,6 @@ def run_pose_estimation(video_name):
                 if dir==1:
                     count += 0.5
                     dir = 0
-            #print(f"count: {count}")
-            #print(f"index: {index}")
 
             #draw bar
             if(per == 100):
@@ -165,6 +200,7 @@ def run_pose_estimation(video_name):
 
 if __name__=="__main__":
     f = open("video_name.txt", 'r')
+
 
     video_name = f.readline().rstrip()
     while video_name: # 여러동영상에 대해 학습데이터 생성
