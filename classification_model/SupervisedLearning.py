@@ -10,16 +10,16 @@ class classification():
     
     def train_csv(self):
         global model
-        df_train=pd.read_csv("./train/train.csv", names=["head","shoulder","elbow","hand","hip","foot","elbow_angle","hip_angle","knee_angle","path","label"]) #학습 데이터들
-        df_test=pd.read_csv("./train/test.csv",names=["head","shoulder","elbow","hand","hip","foot","elbow_angle","hip_angle","knee_angle","path","label"]) #실시간 데이터
+        df_train=pd.read_csv("./dataset/train/train.csv", names=["head","shoulder","elbow","hand","hip","foot","elbow_angle","hip_angle","knee_angle","path","label"]) #학습 데이터들
+        # df_test=pd.read_csv("./train/test.csv",names=["head","shoulder","elbow","hand","hip","foot","elbow_angle","hip_angle","knee_angle","path","label"]) #실시간 데이터
 
         #train 데이터
         x=df_train.drop(columns=['path','label'])
         y=df_train['label']
 
         #테스트 데이터
-        x_test=df_test.drop(columns=['path','label'])
-        y_test=df_test['label']
+        # x_test=df_test.drop(columns=['path','label'])
+        # y_test=df_test['label']
 
         # #데이터 전처리(분할)
         x_train, x_valid, y_train, y_valid = train_test_split(x,y, test_size=0.3,random_state=2020)
@@ -41,7 +41,8 @@ class classification():
         # y_test_pred=model.predict(x_test)
     def keypoint_pred(self,keypoint):
         one_line_pred=model.predict([keypoint])
-        print(one_line_pred)
+        # print(one_line_pred)
+        return(one_line_pred)
 
         # print(classification_report(y_train,y_train_pred))
         # print(classification_report(y_valid,y_valid_pred))

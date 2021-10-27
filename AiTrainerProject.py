@@ -42,12 +42,14 @@ def run_pose_estimation(video_name):
     # 프레임 확인을 위한 변수
     pTime = 0
 
+    #실시간으로 보여주는 label
+    show_label=0
 
     index = 0
     label_list = []
     keypoint_list = []
-    #class_var=classification()
-    #class_var.train_csv()
+    class_var=classification()
+    class_var.train_csv()
     
     detector =pm.poseDetector(video_name)
 
@@ -119,7 +121,8 @@ def run_pose_estimation(video_name):
                 foot = (lmList[28][2])
 
             keypoint = [head, shoulder, elbow, hand, hip, foot, int(elbow_angle), int(hip_angle),int(knee_angle)]  #CSV생성용 키포인트 데이터 생성
-            #class_var.keypoint_pred(keypoint)
+            show_label=class_var.keypoint_pred(keypoint)
+            print(show_label)
             keypoint_list.append(keypoint) 
             #k_max, k_min = max(keypoint), min(keypoint)  #최소값, 최대값 이용하지않고 sholder - hand간 거리로 자세 레이블링
             #answer = defineLabel(keypoint, k_max, k_min)   #레이블 구분 함수 (0,1,2)리턴
