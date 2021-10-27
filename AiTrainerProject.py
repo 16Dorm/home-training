@@ -30,7 +30,6 @@ def run_pose_estimation(video_name):
     pre_label = -1
     cur_label = -1
     prediction = 3
-    counting_idx = 0
     semi_count = 0
     zero_count = 0
 
@@ -129,63 +128,48 @@ def run_pose_estimation(video_name):
             
             
             # 카운트 확인
-            if pre_label != cur_label:
-                zero_count = 0
+            if cur_label == 0:
+                zero_count += 1
+                if zero_count > 10:
+                    semi_count = 0
+                    prediction = 3
+                    pre_label = cur_label
+
+            elif pre_label != cur_label:
                 if cur_label == prediction:
                     if semi_count == 4:
                         count += 1
+                        semi_count = 0
 
-                    semi_count = (semi_count+1) % 5
-                    counting_idx += 1
-                    prediction = labels_table[(counting_idx) % 4]
+                    zero_count = 0
+                    semi_count += 1
+                    prediction = labels_table[semi_count%4]
+
                 else:
                     semi_count = 0
-                    counting_idx = 0
                     prediction = 3
-            else:
-                if cur_label == 0:
-                    zero_count += 1
-                    
-                    if zero_count > 5:
-                        semi_count = 0
-                        counting_idx = 0
-                        prediction = 3
-                        zero_count = 0
 
-            pre_label = cur_label
-
-            '''
-
-            color = (255,0,255)
-            if per==100:
-                color = (0, 255, 0)
-                if dir ==0: #올라가고있다.
-                    count += 0.5
-                    dir = 1
-            if per == 0:
-                color = (0, 255, 0)
-                if dir==1:
-                    count += 0.5
-                    dir = 0
-            '''
-            
-            #draw bar
+                pre_label = cur_label
+             
+            #draw angle bar
             if(per == 100):
                 img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (150, 250, 0), 15, 2)
             elif(per != 0):
                 img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (255, 190, 0), 15, 2)
             
+            #draw full-count bar
+            if(int(count) != 0):
+                img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (90, 90, 255), 10, 2) 
+            elif(int(count) >= 10):
+                img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (30, 30, 255), 10, 2)
+                
             #draw curl count
             if(int(count) < 10):
                 cv2.putText(img, str(int(count)), (1053,650), cv2.FONT_HERSHEY_PLAIN, 10, (180, 50, 50), 15)
             else:
                 cv2.putText(img, str(int(count)), (1020,640), cv2.FONT_HERSHEY_PLAIN, 8, (180, 50, 50), 15)
 
-            #draw count bar
-            if(int(count) != 0):
-                img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (90, 90, 255), 10, 2) 
-            elif(int(count) >= 10):
-                img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (30, 30, 255), 10, 2)
+            
 
 
         cTime = time.time()
