@@ -32,18 +32,12 @@ def run_pose_estimation(video_name):
     prediction = 3
     counting_idx = 0
     semi_count = 0
-
+    zero_count = 0
 
     count = 0
-
-    # 나중엔 안씀ㅋㅋ
-    dir = 0
     
     # 프레임 확인을 위한 변수
     pTime = 0
-
-    #실시간으로 보여주는 label
-    show_label=0
 
     index = 0
     label_list = []
@@ -121,8 +115,9 @@ def run_pose_estimation(video_name):
                 foot = (lmList[28][2])
 
             keypoint = [head, shoulder, elbow, hand, hip, foot, int(elbow_angle), int(hip_angle),int(knee_angle)]  #CSV생성용 키포인트 데이터 생성
-            show_label=class_var.keypoint_pred(keypoint)
-            print(show_label)
+            
+            cur_label = int(class_var.keypoint_pred(keypoint))
+            print(cur_label)
             keypoint_list.append(keypoint) 
             #k_max, k_min = max(keypoint), min(keypoint)  #최소값, 최대값 이용하지않고 sholder - hand간 거리로 자세 레이블링
             #answer = defineLabel(keypoint, k_max, k_min)   #레이블 구분 함수 (0,1,2)리턴
@@ -130,13 +125,12 @@ def run_pose_estimation(video_name):
 
             # 사전에 입력한 시작점과 끝점 외의 준비자세는 레이블을 0으로 둠
             answer = defineLabel(int(elbow_angle), int(hip_angle), int(knee_angle), int(cap.get(cv2.CAP_PROP_POS_FRAMES)), int(start_sec), int(end_sec))
-            label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가
+            label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가  
             
             
             # 카운트 확인
-            '''
-            # cur_label = BKs_func()
             if pre_label != cur_label:
+                zero_count = 0
                 if cur_label == prediction:
                     if semi_count == 4:
                         count += 1
@@ -144,13 +138,22 @@ def run_pose_estimation(video_name):
                     semi_count = (semi_count+1) % 5
                     counting_idx += 1
                     prediction = labels_table[(counting_idx) % 4]
-
                 else:
                     semi_count = 0
                     counting_idx = 0
                     prediction = 3
+            else:
+                if cur_label == 0:
+                    zero_count += 1
+                    
+                    if zero_count > 5:
+                        semi_count = 0
+                        counting_idx = 0
+                        prediction = 3
+                        zero_count = 0
 
             pre_label = cur_label
+
             '''
 
             color = (255,0,255)
@@ -164,7 +167,8 @@ def run_pose_estimation(video_name):
                 if dir==1:
                     count += 0.5
                     dir = 0
-
+            '''
+            
             #draw bar
             if(per == 100):
                 img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (150, 250, 0), 15, 2)
