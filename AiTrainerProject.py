@@ -27,23 +27,26 @@ def run_pose_estimation(video_name):
 
     # count를 위한 변수
     labels_table = [3,2,1,2]
+    count = 0
+    semi_count = 0
+    zero_count = 0
     pre_label = -1
     cur_label = -1
     prediction = 3
-    semi_count = 0
-    zero_count = 0
-
-    count = 0
     
     # 프레임 확인을 위한 변수
     pTime = 0
 
+    # 스켈레톤 검출 및 라벨링 확인을 위한 변수
     index = 0
     label_list = []
     keypoint_list = []
+
+    # 예측 모델 생성
     class_var=classification()
     class_var.train_csv()
-    
+
+    # (준비된)영상 출력을 위한 변수
     detector =pm.poseDetector(video_name)
 
     while True:
@@ -56,7 +59,7 @@ def run_pose_estimation(video_name):
         # 이후에 할일은 포즈 모듈을 가져와야함 포즈 모듈로 각도 재기
         
         img = detector.findPose(img, black_img, index, False) #false를 해서 우리가 보고자하는 점 외에는 다 제거
-        index+=1
+        index += 1
         lmList = detector.findPosition(img, False) #그리기를 원하지 않으므로 false
         per = 0
         # print(lmList) #좌표를 프린트
@@ -151,6 +154,8 @@ def run_pose_estimation(video_name):
 
                 pre_label = cur_label
              
+
+            # 카운팅 횟수/게이지 바 그리기 
             #draw angle bar
             if(per == 100):
                 img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (150, 250, 0), 15, 2)
@@ -169,14 +174,16 @@ def run_pose_estimation(video_name):
             else:
                 cv2.putText(img, str(int(count)), (1020,640), cv2.FONT_HERSHEY_PLAIN, 8, (180, 50, 50), 15)
 
-            
-
-
+        # 프레임 그리기
         cTime = time.time()
         fps = 1/(cTime-pTime)
         pTime = cTime
         cv2.putText(img, str(int(fps)), (50, 100), cv2.FONT_HERSHEY_PLAIN, 5, (255, 0, 0), 5)
+
+        # 픽토그램 그리기
         img = add_Pictogram(img, int(per/34))
+
+        # 최종 출력
         cv2.imshow("Image",img)
         cv2.waitKey(1) 
 
