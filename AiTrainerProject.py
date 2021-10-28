@@ -25,18 +25,17 @@ def run_pose_estimation(video_name):
                 if (end_sec == 0):
                     end_sec = math.ceil(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))/30)
                 break
-
-    print('zzz', start_sec, end_sec)
     
     # count를 위한 변수
     labels_table = [3,2,1,2]
     count = 0
     semi_count = 0
     zero_count = 0
+    deadline_count = 0
     pre_label = -1
     cur_label = -1
     prediction = 3
-    
+
     # 프레임 확인을 위한 변수
     pTime = 0
 
@@ -133,34 +132,33 @@ def run_pose_estimation(video_name):
             
             
             # 카운트 확인
+            # 3 2 1 2 3 순서가 되면 count + 1
+            # 단, 다음 순서 label 값이 들어오기 전에, label 0이 10회 이상 들어오면 리셋
+            # 단, 다음 순서 label 값이 들어오기 전에, 다른 label값이 3회 이상 들어오면 리셋
             if cur_label == 0:
                 zero_count += 1
                 if zero_count > 10:
                     semi_count = 0
                     prediction = 3
                     pre_label = cur_label
-
             elif pre_label != cur_label:
                 if cur_label == prediction:
                     if semi_count == 4:
                         count += 1
                         semi_count = 0
-
                     zero_count = 0
                     semi_count += 1
+                    deadline_count = 0
                     prediction = labels_table[semi_count%4]
-
+                    pre_label = cur_label
                 else:
-                    semi_count = 0
-                    prediction = 3
-
-                pre_label = cur_label
-
-            print('count : ', count)
-            print('semi  : ', semi_count)
-            print('pred  : ', prediction)
-            print('cur   : ', cur_label)
-                
+                    deadline_count += 1
+                    if deadline_count > 3:
+                        semi_count = 0
+                        zero_count = 0
+                        deadline_count = 0
+                        prediction = 3
+                        pre_label = -1
 
             # 카운팅 횟수/게이지 바 그리기 
             #draw angle bar
