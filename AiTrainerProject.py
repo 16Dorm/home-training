@@ -36,9 +36,12 @@ def run_pose_estimation(video_name):
     cur_label = -1
     prediction = 3
 
+    # 게이지 %(percent) 확인을 위한 변수
+    per = 0
+
     # 프레임 확인을 위한 변수
     pTime = 0
-
+    
     # 스켈레톤 검출 및 라벨링 확인을 위한 변수
     index = 0
     label_list = []
@@ -63,7 +66,7 @@ def run_pose_estimation(video_name):
         img = detector.findPose(img, black_img, index, False) #false를 해서 우리가 보고자하는 점 외에는 다 제거
         index += 1
         lmList = detector.findPosition(img, False) #그리기를 원하지 않으므로 false
-        per = 0
+
         # print(lmList) #좌표를 프린트
         keypoint = [] # 핵심 키포인트를 담을 리스트
         if len(lmList)!=0:
