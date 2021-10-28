@@ -1,6 +1,7 @@
 from numpy.core import fromnumeric
 from classification_model.SupervisedLearning import classification
 from math import inf
+import math
 import cv2
 import numpy as np
 import time
@@ -22,9 +23,11 @@ def run_pose_estimation(video_name):
                 start_sec = int(start_sec)
                 end_sec = int(end_sec)
                 if (end_sec == 0):
-                    end_sec = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                    end_sec = math.ceil(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))/30)
                 break
 
+    print('zzz', start_sec, end_sec)
+    
     # count를 위한 변수
     labels_table = [3,2,1,2]
     count = 0
@@ -119,7 +122,6 @@ def run_pose_estimation(video_name):
             keypoint = [head, shoulder, elbow, hand, hip, foot, int(elbow_angle), int(hip_angle),int(knee_angle)]  #CSV생성용 키포인트 데이터 생성
             
             cur_label = int(class_var.keypoint_pred(keypoint))
-            print(cur_label)
             keypoint_list.append(keypoint) 
             #k_max, k_min = max(keypoint), min(keypoint)  #최소값, 최대값 이용하지않고 sholder - hand간 거리로 자세 레이블링
             #answer = defineLabel(keypoint, k_max, k_min)   #레이블 구분 함수 (0,1,2)리턴
@@ -153,7 +155,12 @@ def run_pose_estimation(video_name):
                     prediction = 3
 
                 pre_label = cur_label
-             
+
+            print('count : ', count)
+            print('semi  : ', semi_count)
+            print('pred  : ', prediction)
+            print('cur   : ', cur_label)
+                
 
             # 카운팅 횟수/게이지 바 그리기 
             #draw angle bar
@@ -198,7 +205,6 @@ def run_pose_estimation(video_name):
 
 if __name__=="__main__":
     f = open("video_name.txt", 'r')
-
 
     video_name = f.readline().rstrip()
     while video_name: # 여러동영상에 대해 학습데이터 생성
