@@ -160,24 +160,24 @@ def run_pose_estimation(video_name):
                         prediction = 3
                         pre_label = -1
 
-            # 카운팅 횟수/게이지 바 그리기 
-            #draw angle bar
-            if(per == 100):
-                img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (150, 250, 0), 15, 2)
-            elif(per != 0):
-                img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (255, 190, 0), 15, 2)
+        # 카운팅 횟수/게이지 바 그리기 
+        #draw angle bar
+        if(per == 100):
+            img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (150, 250, 0), 15, 2)
+        elif(per != 0):
+            img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (255, 190, 0), 15, 2)
+        
+        #draw full-count bar
+        if(int(count) != 0):
+            img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (90, 90, 255), 10, 2) 
+        elif(int(count) >= 10):
+            img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (30, 30, 255), 10, 2)
             
-            #draw full-count bar
-            if(int(count) != 0):
-                img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (90, 90, 255), 10, 2) 
-            elif(int(count) >= 10):
-                img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (30, 30, 255), 10, 2)
-                
-            #draw curl count
-            if(int(count) < 10):
-                cv2.putText(img, str(int(count)), (1053,650), cv2.FONT_HERSHEY_PLAIN, 10, (180, 50, 50), 15)
-            else:
-                cv2.putText(img, str(int(count)), (1020,640), cv2.FONT_HERSHEY_PLAIN, 8, (180, 50, 50), 15)
+        #draw curl count
+        if(int(count) < 10):
+            cv2.putText(img, str(int(count)), (1053,650), cv2.FONT_HERSHEY_PLAIN, 10, (180, 50, 50), 15)
+        else:
+            cv2.putText(img, str(int(count)), (1020,640), cv2.FONT_HERSHEY_PLAIN, 8, (180, 50, 50), 15)
 
         # 프레임 그리기
         cTime = time.time()
