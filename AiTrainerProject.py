@@ -12,7 +12,7 @@ from utils.WriteCSV import WriteCSV
 
 def run_pose_estimation(video_name):
     #cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
-    cap=cv2.VideoCapture() #카메라 번호
+    cap=cv2.VideoCapture(0) #카메라 번호
 
     # 사전 준비시간을 label0으로 잘라내기 위한 작업
     with open('video_list.txt', 'r') as infile:
