@@ -9,4 +9,4 @@ results/
 video_name.txt
 
 # 테스트 파일
-test.py
+test*.py

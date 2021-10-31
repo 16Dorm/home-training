@@ -7,6 +7,7 @@ goal_count = 0
 goal_set = 0
 
 class GUI_1(QWidget):
+    
     def __init__(self):
         super().__init__()
         self.setUI()
@@ -16,8 +17,9 @@ class GUI_1(QWidget):
         self.setWindowTitle('AI_Trainer')
         self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
 
-        # 창 사이즈
-        self.resize(300, 200)
+        # 창 사이즈 고정
+        # self.resize(300, 200)
+        self.setFixedSize(315, 200)
 
         # 레이아웃
         self.myLayout = QGridLayout()
@@ -81,7 +83,4 @@ if __name__ == '__main__':
     # 1차 GUI
     mywindow = GUI_1()
     mywindow.show()
-    app.exec_()
-
-    # AI
-    # --code--
+    sys.exit(app.exec_())
