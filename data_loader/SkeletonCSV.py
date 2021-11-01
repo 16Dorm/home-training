@@ -12,9 +12,11 @@ class SkeletonCSV():
         self.train_dir = os.path.join(self.data_dir, 'train')
         self.eval_dir = os.path.join(self.data_dir, 'eval')
 
-        csv_path=os.path.join(self.train_dir, "train.csv")
-        print(csv_path)
-        self.df = pd.read_csv(csv_path, names=self.columns)
+        train_csv_path=os.path.join(self.train_dir, "train.csv")
+        test_csv_path=os.path.join(self.train_dir, "test.csv")
+        print(train_csv_path)
+        self.df = pd.read_csv(train_csv_path, names=self.columns)
+        self.test_df = pd.read_csv(test_csv_path, names=self.columns)
 
     def get_dataset_dataloader(self):
         self.data = SkeletonDataset(self.df, self.trsfm)

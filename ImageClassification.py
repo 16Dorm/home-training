@@ -24,10 +24,10 @@ wandb.login()
 # 1. 데이터 경로 및 하이퍼파라미터
 dataset_dir = './dataset'
 save_dir = './results/'
-MODEL_NAME = "efficientnet_b1"
+MODEL_NAME = "efficientnet_b0"
 num_workers = 0
 learning_rate = 1e-4
-batch_size = 8
+batch_size = 32
 step_size = 5
 epochs = 60
 early_stop =5
@@ -48,6 +48,24 @@ A_transforms = {
                     ToTensorV2()
                 ])
 }
+# A_transforms = {
+#     'train' : A.Compose([
+#                     A.Resize(300, 300),
+#                     A.RandomCrop(224, 224),
+#                     A.HorizontalFlip(p=0.5),
+#                     A.Cutout(num_holes=8, max_h_size=32,max_w_size=32),
+#                     A.ElasticTransform(),
+#                     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+#                     #A.Normalize(mean=[1.0462, 2.4636, 0.4279], std=[12.2819, 22.4455,  3.6525]),
+#                     ToTensorV2()
+#                 ]),
+#     'valid' : A.Compose([
+#                     A.Resize(224, 224),
+#                     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+#                     ToTensorV2()
+#                 ])
+# }
+
 # 2. 시드 고정
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
@@ -94,6 +112,7 @@ valid_loader = DataLoader(valid_dataset, batch_size, shuffle=True, num_workers=n
 calc_train_acc = torchmetrics.Accuracy()
 calc_train_f1 = torchmetrics.F1(num_classes=4)
 calc_valid_acc = torchmetrics.Accuracy()
+calc_eval_acc = torchmetrics.Accuracy()
 
 wandb.init(project="Home-Training", entity='nudago')
 wandb_config = wandb.config
@@ -165,12 +184,35 @@ def train():
 
 # 6. 추론
 def eval():
-    pass
+    skeleton_csv = SkeletonCSV(dataset_dir)
+    eval_dataset = SkeletonDataset(skeleton_csv.test_df, transform=A_transforms['valid'])
+    eval_loader = DataLoader(eval_dataset, batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
+    best_loss = 999999999
+    model.load_state_dict(torch.load(".\\results\\efficientnet_b0\\efficientnet_b0_lr0.0001_batch8_epoch59_valid_loss0.19583.pt"))
+    model.eval()
+    running_loss=0.0
+    with tqdm(eval_loader, total=eval_loader.__len__(), unit='batch') as eval_bar:
+        for batch_idx, (inputs, labels) in enumerate(eval_bar):
+            inputs, labels = inputs.to(device), labels.to(device)
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            print(outputs.argmax(1), labels)
+            loss = criterion(outputs, labels)
 
+            outputs = outputs.cpu().detach()
+            labels = labels.cpu().detach()
+
+            running_loss += loss.item()# * inputs.size(0)
+            epoch_loss = running_loss / len(eval_loader)
+
+            eval_acc = calc_eval_acc(outputs.argmax(1), labels)
+            eval_bar.set_postfix(loss=epoch_loss, acc=eval_acc.item())
+            wandb.log({'eval_loss':epoch_loss, 'eval_acc':calc_eval_acc.compute()})
+    print(calc_eval_acc.compute())
 
 if __name__ == '__main__':
-    if not os.path.exists(f'{save_dir}{MODEL_NAME}'): # save_dir폴더 생성
-        os.makedirs(f'{save_dir}{MODEL_NAME}')
+    #if not os.path.exists(f'{save_dir}{MODEL_NAME}'): # save_dir폴더 생성
+    #    os.makedirs(f'{save_dir}{MODEL_NAME}')
     
-    train() # 학습
+    #train() # 학습
     eval() # 추론
