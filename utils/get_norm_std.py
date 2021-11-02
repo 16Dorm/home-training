@@ -10,7 +10,9 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 
 from data_loader.SkeletonDataset import SkeletonDataset
-from data_loader.SkeletonDataLoader import SkeletonDataLoader
+from data_loader.SkeletonCSV import SkeletonCSV
+from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader
 
 
 # 1. 데이터 경로 및 하이퍼파라미터
@@ -24,8 +26,9 @@ A_transforms = A.Compose([
 
 
 # 2. 학습데이터의 정규분포값 구하기
-skeleton_dataloader = SkeletonDataLoader(dataset_dir, batch_size=batch_size, trsfm=A_transforms, num_worker=num_workers)
-dataset, dataloader = skeleton_dataloader.get_dataset_dataloader()
+skeleton_csv = SkeletonCSV(dataset_dir)
+dataset = SkeletonDataset(skeleton_csv.df, transform=A_transforms)
+dataloader = DataLoader(dataset, batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
 print(len(dataloader))
 
 N_CHANNELS =3
