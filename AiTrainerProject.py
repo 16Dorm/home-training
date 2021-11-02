@@ -167,6 +167,7 @@ def run_pose_estimation(video_name):
     writecsv = WriteCSV('./dataset/train/', "train.csv", label_list, keypoint_list, video_name)
     writecsv.merge_train_csv()
 
+
 if __name__=="__main__":
     f = open("video_name.txt", 'r')
 
