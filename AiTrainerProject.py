@@ -11,8 +11,8 @@ from utils.defineLabel import defineLabel
 from utils.WriteCSV import WriteCSV
 
 def run_pose_estimation(video_name):
-    #cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
-    cap=cv2.VideoCapture(0) #카메라 번호
+    cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
+    #cap=cv2.VideoCapture(0) #카메라 번호
 
     # 사전 준비시간을 label0으로 잘라내기 위한 작업
     with open('video_list.txt', 'r') as infile:
@@ -194,7 +194,7 @@ def run_pose_estimation(video_name):
     #final_min=[min(head),min(shoulder),min(elbow),min(hand),min(hip),min(foot)]
     #print(f"final_max: {final_max}")
     #print(f"final_min: {final_min}")
-    writecsv = WriteCSV('../dataset/train/', "train.csv", label_list, keypoint_list, video_name)
+    writecsv = WriteCSV('./dataset/train/', "train.csv", label_list, keypoint_list, video_name)
     writecsv.merge_train_csv()
 
 if __name__=="__main__":
