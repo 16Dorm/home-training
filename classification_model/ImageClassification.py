@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
 from albumentations.augmentations.transforms import HorizontalFlip
 from albumentations.core.serialization import save
 import numpy as np
@@ -15,7 +19,6 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from tqdm import tqdm
 import copy
-import os
 import random
 import wandb
 wandb.login()
@@ -181,7 +184,7 @@ def eval():
             inputs, labels = inputs.to(device), labels.to(device)
             optimizer.zero_grad()
             outputs = model(inputs)
-            print(outputs.argmax(1), labels)
+            #print(outputs.argmax(1), labels)
             loss = criterion(outputs, labels)
 
             outputs = outputs.cpu().detach()
