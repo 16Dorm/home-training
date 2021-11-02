@@ -9,6 +9,7 @@ import PoseModule as pm
 from utils.add_Pictogram import add_Pictogram
 from utils.defineLabel import defineLabel
 from utils.WriteCSV import WriteCSV
+from utils.Pushup_Counting import Pushup_Counting
 
 def run_pose_estimation(video_name):
     cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
@@ -26,15 +27,10 @@ def run_pose_estimation(video_name):
                     end_sec = math.ceil(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))/30)
                 break
     
-    # count를 위한 변수
-    labels_table = [3,2,1,2]
+    # count를 위한 객체 및 변수
+    pushup_instance = Pushup_Counting()
     count = 0
-    semi_count = 0
-    zero_count = 0
-    deadline_count = 0
-    pre_label = -1
     cur_label = -1
-    prediction = 3
 
     # 게이지 %(percent) 확인을 위한 변수
     per = 0
@@ -128,35 +124,9 @@ def run_pose_estimation(video_name):
             answer = defineLabel(int(elbow_angle), int(hip_angle), int(knee_angle), int(cap.get(cv2.CAP_PROP_POS_FRAMES)), int(start_sec), int(end_sec))
             label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가  
             
-            
             # 카운트 확인
-            # 3 2 1 2 3 순서가 되면 count + 1
-            # 단, 다음 순서 label 값이 들어오기 전에, label 0이 10회 이상 들어오면 리셋
-            # 단, 다음 순서 label 값이 들어오기 전에, 다른 label값이 3회 이상 들어오면 리셋
-            if cur_label == 0:
-                zero_count += 1
-                if zero_count > 10:
-                    semi_count = 0
-                    prediction = 3
-                    pre_label = cur_label
-            elif pre_label != cur_label:
-                if cur_label == prediction:
-                    if semi_count == 4:
-                        count += 1
-                        semi_count = 0
-                    zero_count = 0
-                    semi_count += 1
-                    deadline_count = 0
-                    prediction = labels_table[semi_count%4]
-                    pre_label = cur_label
-                else:
-                    deadline_count += 1
-                    if deadline_count > 3:
-                        semi_count = 0
-                        zero_count = 0
-                        deadline_count = 0
-                        prediction = 3
-                        pre_label = -1
+            count = pushup_instance.cal_count(cur_label)
+            
 
         # 카운팅 횟수/게이지 바 그리기 
         #draw angle bar
