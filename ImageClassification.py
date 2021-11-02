@@ -38,8 +38,10 @@ A_transforms = {
                     A.Resize(250, 250),
                     A.RandomCrop(240, 240),
                     A.HorizontalFlip(p=0.5),
+                    # A.Cutout(num_holes=8, max_h_size=32,max_w_size=32),
+                    # A.ElasticTransform(),
                     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-                    #A.Normalize(mean=[1.0462, 2.4636, 0.4279], std=[12.2819, 22.4455,  3.6525]),
+                    # A.Normalize(mean=[1.0462, 2.4636, 0.4279], std=[12.2819, 22.4455,  3.6525]),
                     ToTensorV2()
                 ]),
     'valid' : A.Compose([
@@ -48,23 +50,6 @@ A_transforms = {
                     ToTensorV2()
                 ])
 }
-# A_transforms = {
-#     'train' : A.Compose([
-#                     A.Resize(300, 300),
-#                     A.RandomCrop(224, 224),
-#                     A.HorizontalFlip(p=0.5),
-#                     A.Cutout(num_holes=8, max_h_size=32,max_w_size=32),
-#                     A.ElasticTransform(),
-#                     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-#                     #A.Normalize(mean=[1.0462, 2.4636, 0.4279], std=[12.2819, 22.4455,  3.6525]),
-#                     ToTensorV2()
-#                 ]),
-#     'valid' : A.Compose([
-#                     A.Resize(224, 224),
-#                     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-#                     ToTensorV2()
-#                 ])
-# }
 
 # 2. 시드 고정
 torch.manual_seed(seed)

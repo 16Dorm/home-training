@@ -67,7 +67,6 @@ def run_pose_estimation(video_name):
         index += 1
         lmList = detector.findPosition(img, False) #그리기를 원하지 않으므로 false
 
-        # print(lmList) #좌표를 프린트
         keypoint = [] # 핵심 키포인트를 담을 리스트
         if len(lmList)!=0:
             # print(lmList[24][1])  # 24번은 엉덩이 x축 좌표만
@@ -112,7 +111,6 @@ def run_pose_estimation(video_name):
 
                 # 각도를 퍼센트로 나타내는 코드
                 per = np.interp(elbow_angle, (80, 160), (100, 0))
-                # print(angle, per)
                 bar = np.interp(elbow_angle, (80, 160), (650, 100))  # 앞에가 최소 뒤에가 최대
                 head = (lmList[0][2])
                 shoulder = (lmList[12][2])
@@ -125,9 +123,6 @@ def run_pose_estimation(video_name):
             
             cur_label = int(class_var.keypoint_pred(keypoint))
             keypoint_list.append(keypoint) 
-            #k_max, k_min = max(keypoint), min(keypoint)  #최소값, 최대값 이용하지않고 sholder - hand간 거리로 자세 레이블링
-            #answer = defineLabel(keypoint, k_max, k_min)   #레이블 구분 함수 (0,1,2)리턴
-            #keypoint = [shoulder,hand] 
 
             # 사전에 입력한 시작점과 끝점 외의 준비자세는 레이블을 0으로 둠
             answer = defineLabel(int(elbow_angle), int(hip_angle), int(knee_angle), int(cap.get(cv2.CAP_PROP_POS_FRAMES)), int(start_sec), int(end_sec))
@@ -199,8 +194,6 @@ def run_pose_estimation(video_name):
     #final_min=[min(head),min(shoulder),min(elbow),min(hand),min(hip),min(foot)]
     #print(f"final_max: {final_max}")
     #print(f"final_min: {final_min}")
-
-    # print(label_list)
     writecsv = WriteCSV('./dataset/train/', label_list, keypoint_list, video_name)
     writecsv.merge_train_csv()
 
