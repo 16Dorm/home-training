@@ -44,5 +44,4 @@ class Pushup_Counting:
                     self.prediction = 3
                     self.pre_label = -1
 
-        print(self.count)
         return self.count
