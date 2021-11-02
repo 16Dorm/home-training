@@ -1,5 +1,7 @@
+from numpy.core import fromnumeric
 from classification_model.SupervisedLearning import classification
 from math import inf
+import math
 import cv2
 import numpy as np
 import time
@@ -9,8 +11,8 @@ from utils.defineLabel import defineLabel
 from utils.WriteCSV import WriteCSV
 
 def run_pose_estimation(video_name):
-    cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
-    #cap2=cv2.VideoCapture(0) #카메라 번호
+    #cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
+    cap=cv2.VideoCapture(0) #카메라 번호
 
     # 사전 준비시간을 label0으로 잘라내기 위한 작업
     with open('video_list.txt', 'r') as infile:
@@ -21,18 +23,37 @@ def run_pose_estimation(video_name):
                 start_sec = int(start_sec)
                 end_sec = int(end_sec)
                 if (end_sec == 0):
-                    end_sec = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                    end_sec = math.ceil(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))/30)
                 break
-
-    detector =pm.poseDetector(video_name)
+    
+    # count를 위한 변수
+    labels_table = [3,2,1,2]
     count = 0
-    dir = 0
+    semi_count = 0
+    zero_count = 0
+    deadline_count = 0
+    pre_label = -1
+    cur_label = -1
+    prediction = 3
+
+    # 게이지 %(percent) 확인을 위한 변수
+    per = 0
+
+    # 프레임 확인을 위한 변수
     pTime = 0
+    
+    # 스켈레톤 검출 및 라벨링 확인을 위한 변수
     index = 0
     label_list = []
     keypoint_list = []
-    #class_var=classification()
-    #class_var.train_csv()
+
+    # 예측 모델 생성
+    class_var=classification()
+    class_var.train_csv()
+
+    # (준비된)영상 출력을 위한 변수
+    detector =pm.poseDetector(video_name)
+
     while True:
         success, img =cap.read()
         if not success:
@@ -43,9 +64,9 @@ def run_pose_estimation(video_name):
         # 이후에 할일은 포즈 모듈을 가져와야함 포즈 모듈로 각도 재기
         
         img = detector.findPose(img, black_img, index, False) #false를 해서 우리가 보고자하는 점 외에는 다 제거
-        index+=1
+        index += 1
         lmList = detector.findPosition(img, False) #그리기를 원하지 않으므로 false
-        per = 0
+
         # print(lmList) #좌표를 프린트
         keypoint = [] # 핵심 키포인트를 담을 리스트
         if len(lmList)!=0:
@@ -101,7 +122,8 @@ def run_pose_estimation(video_name):
                 foot = (lmList[28][2])
 
             keypoint = [head, shoulder, elbow, hand, hip, foot, int(elbow_angle), int(hip_angle),int(knee_angle)]  #CSV생성용 키포인트 데이터 생성
-            #class_var.keypoint_pred(keypoint)
+            
+            cur_label = int(class_var.keypoint_pred(keypoint))
             keypoint_list.append(keypoint) 
             #k_max, k_min = max(keypoint), min(keypoint)  #최소값, 최대값 이용하지않고 sholder - hand간 거리로 자세 레이블링
             #answer = defineLabel(keypoint, k_max, k_min)   #레이블 구분 함수 (0,1,2)리턴
@@ -109,48 +131,67 @@ def run_pose_estimation(video_name):
 
             # 사전에 입력한 시작점과 끝점 외의 준비자세는 레이블을 0으로 둠
             answer = defineLabel(int(elbow_angle), int(hip_angle), int(knee_angle), int(cap.get(cv2.CAP_PROP_POS_FRAMES)), int(start_sec), int(end_sec))
-            label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가
+            label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가  
             
-            # print(hip_angle,elbow_angle,knee_angle)
-            #check for the push up curls
-            color = (255,0,255)
-            if per==100:
-                color = (0, 255, 0)
-                if dir ==0: #올라가고있다.
-                    count += 0.5
-                    dir = 1
-            if per == 0:
-                color = (0, 255, 0)
-                if dir==1:
-                    count += 0.5
-                    dir = 0
-            #print(f"count: {count}")
-            #print(f"index: {index}")
-
-            #draw bar
-            if(per == 100):
-                img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (150, 250, 0), 15, 2)
-            elif(per != 0):
-                img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (255, 190, 0), 15, 2)
             
-            #draw curl count
-            if(int(count) < 10):
-                cv2.putText(img, str(int(count)), (1053,650), cv2.FONT_HERSHEY_PLAIN, 10, (180, 50, 50), 15)
-            else:
-                cv2.putText(img, str(int(count)), (1020,640), cv2.FONT_HERSHEY_PLAIN, 8, (180, 50, 50), 15)
+            # 카운트 확인
+            # 3 2 1 2 3 순서가 되면 count + 1
+            # 단, 다음 순서 label 값이 들어오기 전에, label 0이 10회 이상 들어오면 리셋
+            # 단, 다음 순서 label 값이 들어오기 전에, 다른 label값이 3회 이상 들어오면 리셋
+            if cur_label == 0:
+                zero_count += 1
+                if zero_count > 10:
+                    semi_count = 0
+                    prediction = 3
+                    pre_label = cur_label
+            elif pre_label != cur_label:
+                if cur_label == prediction:
+                    if semi_count == 4:
+                        count += 1
+                        semi_count = 0
+                    zero_count = 0
+                    semi_count += 1
+                    deadline_count = 0
+                    prediction = labels_table[semi_count%4]
+                    pre_label = cur_label
+                else:
+                    deadline_count += 1
+                    if deadline_count > 3:
+                        semi_count = 0
+                        zero_count = 0
+                        deadline_count = 0
+                        prediction = 3
+                        pre_label = -1
 
-            #draw count bar
-            if(int(count) != 0):
-                img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (90, 90, 255), 10, 2) 
-            elif(int(count) >= 10):
-                img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (30, 30, 255), 10, 2)
+        # 카운팅 횟수/게이지 바 그리기 
+        #draw angle bar
+        if(per == 100):
+            img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (150, 250, 0), 15, 2)
+        elif(per != 0):
+            img = cv2.ellipse(img, (1100,600), (90,90), 270, 0, per*3.6, (255, 190, 0), 15, 2)
+        
+        #draw full-count bar
+        if(int(count) != 0):
+            img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (90, 90, 255), 10, 2) 
+        elif(int(count) >= 10):
+            img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*36, (30, 30, 255), 10, 2)
+            
+        #draw curl count
+        if(int(count) < 10):
+            cv2.putText(img, str(int(count)), (1053,650), cv2.FONT_HERSHEY_PLAIN, 10, (180, 50, 50), 15)
+        else:
+            cv2.putText(img, str(int(count)), (1020,640), cv2.FONT_HERSHEY_PLAIN, 8, (180, 50, 50), 15)
 
-
+        # 프레임 그리기
         cTime = time.time()
         fps = 1/(cTime-pTime)
         pTime = cTime
         cv2.putText(img, str(int(fps)), (50, 100), cv2.FONT_HERSHEY_PLAIN, 5, (255, 0, 0), 5)
+
+        # 픽토그램 그리기
         img = add_Pictogram(img, int(per/34))
+
+        # 최종 출력
         cv2.imshow("Image",img)
         cv2.waitKey(1) 
 
