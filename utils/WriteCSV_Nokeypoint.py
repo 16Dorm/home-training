@@ -36,7 +36,7 @@ if __name__ == "__main__":
     rdr = csv.reader(f)
     for line in rdr:
         print([line[7:9]])
-        writecsv = WriteCSV('./train',  line[7:9])
+        writecsv = WriteCSV('./train', "train.csv",  line[7:9])
         writecsv._write_train_csv([line[7:9]])
 
     f.close()
