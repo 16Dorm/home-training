@@ -6,7 +6,7 @@
 class Pushup_Counting:
 
     def __init__(self):
-        self.label_table = [3,2,1,2] 
+        self.label_table = [3,2,1,2]
         self.count = 0
         self.semi_count = 0
         self.zeors_count = 0
@@ -15,12 +15,17 @@ class Pushup_Counting:
         self.cur_label = -1
         self.prediction = 3
 
+        self.result = False
+
     def cal_count(self, input_label):
         
         self.cur_label = input_label
+        
+        self.result = True
 
         if self.cur_label == 0:
             self.zeors_count += 1
+            self.result = False
             if self.zeors_count > 10:
                 self.semi_count = 0
                 self.prediction = 3
@@ -37,6 +42,7 @@ class Pushup_Counting:
                 self.pre_label = self.cur_label
             else:
                 self.deadline_count += 1
+                self.result = False
                 if self.deadline_count > 3:
                     self.semi_count = 0
                     self.zeors_count = 0
@@ -44,4 +50,4 @@ class Pushup_Counting:
                     self.prediction = 3
                     self.pre_label = -1
 
-        return self.count
+        return self.count, self.result

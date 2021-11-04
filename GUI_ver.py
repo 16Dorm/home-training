@@ -3,6 +3,7 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from time import sleep
 
 # AI
 from numpy.core import fromnumeric
@@ -116,16 +117,31 @@ class GUI_2(QWidget):
         label1.setPixmap(pixmap)
         self.myLayout.addWidget(label1, 0,0, 2,2)
 
-        # 설명 라벨
-        label2 = QLabel('결과 이미지 및 등등', self)
-        self.myLayout.addWidget(label2, 0,2)
-
         # 이미지 라벨
         label3 = QLabel(self)
-        pixmap = QPixmap('./GUI/graph.png')
-        pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
-        label3.setPixmap(pixmap)
-        self.myLayout.addWidget(label3, 2,0, 2,2)
+
+        img = np.zeros((300, 300, 3), dtype=np.uint8)
+        img[:,:] = [240, 240, 240]
+        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, 360, (255, 255, 255), 20, 10)
+        height, width, channel = img.shape
+        bytesPerLine = 3 * width
+
+        loop_cnt = 1
+        while 1:
+            if loop_cnt > 100:
+                break
+            img = cv2.ellipse(img, (150,150), (110,110), 270, 0, loop_cnt*3.6, (150, 250, 0), 20, 10)
+            qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
+            pixmap = QPixmap(qImg)
+            pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
+            
+            label3.setPixmap(pixmap)
+            self.myLayout.addWidget(label3, 2,0, 2,2)
+
+            label3.repaint()
+            self.show()
+            sleep(0.01)
+            loop_cnt += 1
 
         # 횟수 라벨
         label4 = QLabel('결과 이미지 및 등등', self)
@@ -134,6 +150,10 @@ class GUI_2(QWidget):
         self.show()
   
 class AI_Train():
+
+    def __init__(self):
+        self.full_frmes = 0
+        self.incorrect_cnt = 0
 
     def run_pose_estimation(self, video_name, goal_cnt, goal_set):
         
@@ -252,8 +272,11 @@ class AI_Train():
                 label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가  
                 
                 # 카운트 확인
-                count = pushup_instance.cal_count(cur_label)
-                
+                count, isCorrect = pushup_instance.cal_count(cur_label)
+
+                self.full_frmes += 1
+                if(not(isCorrect)):
+                    self.incorrect_cnt += 1
 
             # 카운팅 횟수/게이지 바 그리기 
             #draw angle bar
@@ -304,6 +327,7 @@ if __name__ == '__main__':
     mywindow_1 = GUI_1()
     mywindow_1.show()
     app.exec_()
+    mywindow_1.close()
 
     # AI
     # --code--
