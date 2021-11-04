@@ -18,6 +18,7 @@ from utils.add_Pictogram import add_Pictogram
 from utils.defineLabel import defineLabel
 from utils.WriteCSV import WriteCSV
 from utils.Pushup_Counting import Pushup_Counting
+from GUI.make_graph import make_graph
 
 # GUI_1 -> AI
 
@@ -109,6 +110,9 @@ class GUI_2(QWidget):
         # 레이아웃
         self.myLayout = QGridLayout()
         self.setLayout(self.myLayout)
+
+        # graph 생성
+        make_graph(AI_intance.incorrect_cnt, AI_intance.full_frmes)
 
         # 이미지 라벨
         label1 = QLabel(self)
@@ -340,13 +344,11 @@ if __name__ == '__main__':
     sys.exit(app.exec_())
 
 
-
-
-
     '''
     추후 할 것
     1. 결과 창 꾸미기
     2. 각 창 안 닫아지는 현상 해결하기
-    3. 목표 횟수 도달 후 세트 변경시 어떻게 할지 생각하기
-    4. 실시간으로 수행 할 때도 video_name이 있어아햐는 문제 해결하기 (detector =pm.poseDetector(video_name) <-- 이게 문제인듯?)
+    3. 결과창 애니메이션? 안되는 현상
+    4. 목표 횟수 도달 후 세트 변경시 어떻게 할지 생각하기
+    5. 실시간으로 수행 할 때도 video_name이 있어아햐는 문제 해결하기 (detector =pm.poseDetector(video_name) <-- 이게 문제인듯?)
     '''
