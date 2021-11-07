@@ -198,7 +198,7 @@ class GUI_2(QWidget):
         self.myLayout.addWidget(label4, 2,5)
 
         self.show()
-  
+
 class AI_Train():
 
     def __init__(self):
@@ -376,6 +376,57 @@ class AI_Train():
         #writecsv = WriteCSV('./dataset/train/', "train.csv", label_list, keypoint_list, video_name)
         #writecsv.merge_train_csv()
         cv2.destroyAllWindows()
+
+class GUI_timer(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.temp = 10
+        self.setUI()
+
+    def setUI(self):
+        # 타이틀
+        self.setWindowTitle('AI_Trainer')
+        self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
+
+        # 창 사이즈 고정
+        self.setFixedSize(320, 250)
+
+        # 레이아웃 설정
+        self.mylayout = QVBoxLayout()
+
+        # 타이머 생성
+        self.timer = QTimer(self)
+
+        # 1000ms마다 timeout실행
+        self.timer.setInterval(1000)
+        self.timer.timeout.connect(self.timeout)
+ 
+        # LCD객체 생성
+        self.lcd = QLCDNumber()
+
+        # 글씨 칸 조절
+        self.lcd.setDigitCount(3)
+
+        # LCD에 숫자 띄우기 (숫자 맞추기 위해 -1 실행)
+        self.lcd.display(self.temp)
+        self.temp -= 1
+        
+        # 레이아웃에 따른 위치 설정
+        self.mylayout.addWidget(self.lcd)
+        self.setLayout(self.mylayout) 
+
+        # 타이머 시작
+        self.timer.start()
+
+    def timeout(self):
+        currentTime = self.temp
+        self.temp -= 1
+        self.lcd.display(currentTime)
+        
+        # 타이머 종료
+        if self.temp < 0:
+            self.timer.stop()
+            QCoreApplication.instance().quit()
 
 if __name__ == '__main__':
 
