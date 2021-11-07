@@ -20,11 +20,12 @@ from utils.WriteCSV import WriteCSV
 from utils.Pushup_Counting import Pushup_Counting
 from GUI.make_graph import make_graph
 
-# GUI_1 -> AI
+# GUI_1 -> AI -> GUI_2
 
 class GUI_1(QWidget):
     def __init__(self):
         super().__init__()
+        self.weight = 0
         self.goal_count = 3
         self.goal_set = 1
         self.setUI()
@@ -36,7 +37,7 @@ class GUI_1(QWidget):
 
         # 창 사이즈 고정
         # self.resize(1280, 720)
-        self.setFixedSize(315, 200)
+        self.setFixedSize(320, 250)
         #self.setFixedSize(1280, 720)
 
         # 레이아웃
@@ -44,16 +45,24 @@ class GUI_1(QWidget):
         self.setLayout(self.myLayout)
 
         # GIF
-        label = QLabel()
+        label_gif = QLabel()
         self.movie = QMovie('./GUI/Pictogram_gif.gif', QByteArray(), self)
         self.movie.setCacheMode(QMovie.CacheAll)
-        label.setMovie(self.movie)
+        label_gif.setMovie(self.movie)
         self.movie.start()
-        self.myLayout.addWidget(label, 0,0, 1,3)
+        self.myLayout.addWidget(label_gif, 0,0, 1,3)
+
+        # 몸무게 라벨
+        label_weight = QLabel('몸무게를 입력해 주세요.', self)
+        self.myLayout.addWidget(label_weight, 2,0)
+
+        # 몸무게 텍스트박스
+        lineedit1 = QLineEdit(self)
+        self.myLayout.addWidget(lineedit1, 2,1)
 
         # 횟수 라벨
         label2 = QLabel('목표 횟수를 입력해 주세요.', self)
-        self.myLayout.addWidget(label2, 1,0)
+        self.myLayout.addWidget(label2, 3,0)
 
         # 횟수 콤보박스
         combo1 = QComboBox(self)
@@ -64,11 +73,11 @@ class GUI_1(QWidget):
         combo1.addItem('20')
         combo1.addItem('100')
         combo1.activated[str].connect(lambda :self.selectedComboItem(combo1, "cnt"))
-        self.myLayout.addWidget(combo1, 1,1)
+        self.myLayout.addWidget(combo1, 3,1)
 
         # 세트 라벨
         label3 = QLabel('목표 세트를 입력해 주세요.', self)
-        self.myLayout.addWidget(label3, 2,0)
+        self.myLayout.addWidget(label3, 4,0)
 
         # 세트 콤보박스
         combo2 = QComboBox(self)
@@ -78,12 +87,12 @@ class GUI_1(QWidget):
         combo2.addItem('4')
         combo2.addItem('5')
         combo2.activated[str].connect(lambda :self.selectedComboItem(combo2, "set"))
-        self.myLayout.addWidget(combo2, 2,1)
+        self.myLayout.addWidget(combo2, 4,1)
 
         # 확인 버튼
         button1 = QPushButton('확인', self)
-        self.myLayout.addWidget(button1, 2,2)
-        button1.clicked.connect(QCoreApplication.instance().quit)
+        self.myLayout.addWidget(button1, 4,2)
+        button1.clicked.connect(lambda: self.btnClickedEvent(lineedit1))
 
     def selectedComboItem(self,text,type):
         if type == "cnt":
@@ -94,6 +103,12 @@ class GUI_1(QWidget):
             print("set : ", self.goal_set)
         else:
             print("combobox type check error")
+
+    def btnClickedEvent(self, txt):
+        self.weight = int(txt.text())
+        print(self.weight)
+        QCoreApplication.instance().quit()
+
 
 class GUI_2(QWidget):
     def __init__(self):
