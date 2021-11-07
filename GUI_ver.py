@@ -25,7 +25,7 @@ from GUI.make_graph import make_graph
 class GUI_1(QWidget):
     def __init__(self):
         super().__init__()
-        self.weight = 0
+        self.weight = 60
         self.goal_count = 3
         self.goal_set = 1
         self.setUI()
@@ -44,6 +44,9 @@ class GUI_1(QWidget):
         self.myLayout = QGridLayout()
         self.setLayout(self.myLayout)
 
+        # 입력 제한자
+        self.onlyInt = QIntValidator()
+
         # GIF
         label_gif = QLabel()
         self.movie = QMovie('./GUI/Pictogram_gif.gif', QByteArray(), self)
@@ -58,7 +61,7 @@ class GUI_1(QWidget):
 
         # 몸무게 텍스트박스
         lineedit1 = QLineEdit(self)
-        self.onlyInt = QIntValidator()
+        lineedit1.setText(str(self.weight))
         lineedit1.setValidator(self.onlyInt)
         self.myLayout.addWidget(lineedit1, 2,1)
 
