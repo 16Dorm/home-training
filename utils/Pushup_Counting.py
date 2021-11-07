@@ -42,8 +42,8 @@ class Pushup_Counting:
                 self.pre_label = self.cur_label
             else:
                 self.deadline_count += 1
-                self.result = False
                 if self.deadline_count > 3:
+                    self.result = False
                     self.semi_count = 0
                     self.zeors_count = 0
                     self.deadline_count = 0

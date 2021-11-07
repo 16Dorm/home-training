@@ -35,8 +35,9 @@ class GUI_1(QWidget):
         self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
 
         # 창 사이즈 고정
-        # self.resize(300, 200)
+        # self.resize(1280, 720)
         self.setFixedSize(315, 200)
+        #self.setFixedSize(1280, 720)
 
         # 레이아웃
         self.myLayout = QGridLayout()
@@ -98,6 +99,7 @@ class GUI_2(QWidget):
     def __init__(self):
         super().__init__()
         self.setUI()
+        self.weight = 90
 
     def setUI(self):
         # 타이틀
@@ -105,14 +107,14 @@ class GUI_2(QWidget):
         self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
 
         # 창 사이즈 고정
-        self.setFixedSize(1200, 800)
+        self.setFixedSize(1280, 720)
 
         # 레이아웃
         self.myLayout = QGridLayout()
         self.setLayout(self.myLayout)
 
         # graph 생성
-        make_graph(AI_intance.incorrect_cnt, AI_intance.full_frmes)
+        make_graph(AI_intance.incorrect_cnt, AI_intance.full_frames)
 
         # 이미지 라벨
         label1 = QLabel(self)
@@ -156,7 +158,8 @@ class GUI_2(QWidget):
 class AI_Train():
 
     def __init__(self):
-        self.full_frmes = 0
+        self.accuracy = False
+        self.full_frames = 0
         self.incorrect_cnt = 0
 
     def run_pose_estimation(self, video_name, goal_cnt, goal_set):
@@ -278,8 +281,14 @@ class AI_Train():
                 # 카운트 확인
                 count, isCorrect = pushup_instance.cal_count(cur_label)
 
-                self.full_frmes += 1
-                if(not(isCorrect)):
+                # 정확도 체크 시작
+                if self.accuracy == False and cur_label == 3:
+                    self.accuracy = True
+                
+                if self.accuracy == True:
+                    self.full_frames += 1
+
+                if(not(isCorrect) and self.accuracy == True):
                     self.incorrect_cnt += 1
 
             # 카운팅 횟수/게이지 바 그리기 
@@ -322,6 +331,7 @@ class AI_Train():
         # WriteCSV 제거
         #writecsv = WriteCSV('./dataset/train/', "train.csv", label_list, keypoint_list, video_name)
         #writecsv.merge_train_csv()
+        cv2.destroyAllWindows()
 
 if __name__ == '__main__':
 
@@ -336,19 +346,17 @@ if __name__ == '__main__':
     # AI
     # --code--
     AI_intance = AI_Train()
-    AI_intance.run_pose_estimation("pushup_18", mywindow_1.goal_count, mywindow_1.goal_set)
-
+    AI_intance.run_pose_estimation("pushup_08", mywindow_1.goal_count, mywindow_1.goal_set)
+    
     # 2차 GUI
     mywindow_2 = GUI_2()
     mywindow_2.show()
     sys.exit(app.exec_())
 
-
     '''
     추후 할 것
-    1. 결과 창 꾸미기
-    2. 각 창 안 닫아지는 현상 해결하기
-    3. 결과창 애니메이션? 안되는 현상
-    4. 목표 횟수 도달 후 세트 변경시 어떻게 할지 생각하기
-    5. 실시간으로 수행 할 때도 video_name이 있어아햐는 문제 해결하기 (detector =pm.poseDetector(video_name) <-- 이게 문제인듯?)
+    0. 몸무게 입력 
+    1. 결과 창 꾸미기 (정확도/칼로리?)
+    2. 목표 횟수 도달 후 세트 변경시 어떻게 할지 생각하기
+    3. 실시간으로 수행 할 때도 video_name이 있어아햐는 문제 해결하기 (detector =pm.poseDetector(video_name) <-- 이게 문제인듯?)
     '''
