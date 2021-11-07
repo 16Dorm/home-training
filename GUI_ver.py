@@ -28,6 +28,7 @@ class GUI_1(QWidget):
         self.weight = 60
         self.goal_count = 3
         self.goal_set = 1
+        self.isPressedConfirm = False
         self.setUI()
 
     def setUI(self):
@@ -111,7 +112,7 @@ class GUI_1(QWidget):
 
     def btnClickedEvent(self, txt):
         self.weight = int(txt.text())
-        print(self.weight)
+        self.isPressedConfirm = True
         QCoreApplication.instance().quit()
 
 class GUI_2(QWidget):
@@ -191,8 +192,6 @@ class GUI_2(QWidget):
         
         label333.setPixmap(pixmap)
         self.myLayout.addWidget(label333, 0,3, 2,4)
-
-
 
         # 횟수 라벨
         label4 = QLabel('결과 이미지 및 등등', self)
@@ -388,15 +387,16 @@ if __name__ == '__main__':
     app.exec_()
     mywindow_1.close()
 
-    # AI
-    # --code--
-    AI_intance = AI_Train()
-    AI_intance.run_pose_estimation("pushup_08", mywindow_1.goal_count, mywindow_1.goal_set)
-    
-    # 2차 GUI
-    mywindow_2 = GUI_2()
-    mywindow_2.show()
-    sys.exit(app.exec_())
+    if mywindow_1.isPressedConfirm == True:
+        # AI
+        # --code--
+        AI_intance = AI_Train()
+        AI_intance.run_pose_estimation("pushup_08", mywindow_1.goal_count, mywindow_1.goal_set)
+        
+        # 2차 GUI
+        mywindow_2 = GUI_2()
+        mywindow_2.show()
+        sys.exit(app.exec_())
 
     '''
     추후 할 것
