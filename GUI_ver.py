@@ -58,6 +58,8 @@ class GUI_1(QWidget):
 
         # 몸무게 텍스트박스
         lineedit1 = QLineEdit(self)
+        self.onlyInt = QIntValidator()
+        lineedit1.setValidator(self.onlyInt)
         self.myLayout.addWidget(lineedit1, 2,1)
 
         # 횟수 라벨
