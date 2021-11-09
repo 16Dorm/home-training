@@ -22,16 +22,32 @@ from GUI.make_graph import make_graph
 
 # GUI_form -> AI -> GUI_result
 
-class GUI_form(QWidget):
+class GUI_data():
     def __init__(self):
-        super().__init__()
+        # GUI_form
         self.weight = 60
-        self.goal_count = 3
+        self.goal_cnt = 3
         self.goal_set = 1
         self.isPressedConfirm = False
-        self.setUI()
 
-    def setUI(self):
+        # AI
+        self.accuracy = False
+        self.full_frames = 0
+        self.incorrect_frames = 0
+
+        # GUI_Timer
+        self.interval_sec_per_set = 10
+
+        # GUI_result
+        self.Home = True
+        self.isReplay = False
+
+class GUI_form(QWidget):
+    def __init__(self, dataset):
+        super().__init__()
+        self.setUI(dataset)
+
+    def setUI(self, dataset):
         # 타이틀
         self.setWindowTitle('AI_Trainer')
         self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
@@ -62,7 +78,7 @@ class GUI_form(QWidget):
 
         # 몸무게 텍스트박스
         lineedit1 = QLineEdit(self)
-        lineedit1.setText(str(self.weight))
+        lineedit1.setText(str(dataset.weight))
         lineedit1.setValidator(self.onlyInt)
         self.myLayout.addWidget(lineedit1, 2,1)
 
@@ -78,7 +94,7 @@ class GUI_form(QWidget):
         combo1.addItem('12')
         combo1.addItem('20')
         combo1.addItem('100')
-        combo1.activated[str].connect(lambda :self.selectedComboItem(combo1, "cnt"))
+        combo1.activated[str].connect(lambda :self.selectedComboItem(combo1, "cnt", dataset))
         self.myLayout.addWidget(combo1, 3,1)
 
         # 세트 라벨
@@ -92,7 +108,7 @@ class GUI_form(QWidget):
         combo2.addItem('3')
         combo2.addItem('4')
         combo2.addItem('5')
-        combo2.activated[str].connect(lambda :self.selectedComboItem(combo2, "set"))
+        combo2.activated[str].connect(lambda :self.selectedComboItem(combo2, "set", dataset))
         self.myLayout.addWidget(combo2, 4,1)
 
         # 확인 버튼
@@ -100,31 +116,25 @@ class GUI_form(QWidget):
         self.myLayout.addWidget(button1, 4,2)
         button1.clicked.connect(lambda: self.btnClickedEvent(lineedit1))
 
-    def selectedComboItem(self,text,type):
+    def selectedComboItem(self,text,type, dataset):
         if type == "cnt":
-            self.goal_count = int(text.currentText())
-            print("cnt : ", self.goal_count)
+            dataset.goal_cnt = int(text.currentText())
+            print("cnt : ", dataset.goal_cnt)
         elif type == "set":
-            self.goal_set = int(text.currentText())
-            print("set : ", self.goal_set)
+            dataset.goal_set = int(text.currentText())
+            print("set : ", dataset.goal_set)
         else:
             print("combobox type check error")
 
     def btnClickedEvent(self, txt):
-        self.weight = int(txt.text())
-        self.isPressedConfirm = True
+        dataset.weight = int(txt.text())
+        dataset.isPressedConfirm = True
         QCoreApplication.instance().quit()
 
 class AI_Train():
-
-    def __init__(self):
-        self.accuracy = False
-        self.full_frames = 0
-        self.incorrect_cnt = 0
-
-    def run_pose_estimation(self, video_name, goal_cnt, goal_set):
+    def run_pose_estimation(video_name, dataset):
         
-        print(goal_cnt, goal_set)
+        print(dataset.weight, dataset.goal_cnt, dataset.goal_set)
         
         cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
         #cap=cv2.VideoCapture(0) #카메라 번호
@@ -242,14 +252,14 @@ class AI_Train():
                 count, isCorrect = pushup_instance.cal_count(cur_label)
 
                 # 정확도 체크 시작
-                if self.accuracy == False and cur_label == 3:
-                    self.accuracy = True
+                if dataset.accuracy == False and cur_label == 3:
+                    dataset.accuracy = True
                 
-                if self.accuracy == True:
-                    self.full_frames += 1
+                if dataset.accuracy == True:
+                    dataset.full_frames += 1
 
-                if(not(isCorrect) and self.accuracy == True):
-                    self.incorrect_cnt += 1
+                if(not(isCorrect) and dataset.accuracy == True):
+                    dataset.incorrect_frames += 1
 
             # 카운팅 횟수/게이지 바 그리기 
             #draw angle bar
@@ -260,9 +270,9 @@ class AI_Train():
             
             #draw full-count bar
             if(int(count) != 0):
-                img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*int(360/goal_cnt), (90, 90, 255), 10, 2) 
+                img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*int(360/dataset.goal_cnt), (90, 90, 255), 10, 2) 
             elif(int(count) >= 10):
-                img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*int(360/goal_cnt), (30, 30, 255), 10, 2)
+                img = cv2.ellipse(img, (1100,600), (105,105), 270, 0, int(count)*int(360/dataset.goal_cnt), (30, 30, 255), 10, 2)
                 
             #draw curl count
             if(int(count) < 10):
@@ -294,12 +304,11 @@ class AI_Train():
         cv2.destroyAllWindows()
 
 class GUI_timer(QWidget):
-    def __init__(self):
+    def __init__(self, dataset):
         super().__init__()
-        self.temp = 10
-        self.setUI()
+        self.setUI(dataset)
 
-    def setUI(self):
+    def setUI(self, dataset):
         # 타이틀
         self.setWindowTitle('AI_Trainer')
         self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
@@ -324,8 +333,8 @@ class GUI_timer(QWidget):
         self.lcd.setDigitCount(3)
 
         # LCD에 숫자 띄우기 (숫자 맞추기 위해 -1 실행)
-        self.lcd.display(self.temp)
-        self.temp -= 1
+        self.lcd.display(dataset.interval_sec_per_set)
+        dataset.interval_sec_per_set -= 1
         
         # 레이아웃에 따른 위치 설정
         self.mylayout.addWidget(self.lcd)
@@ -334,22 +343,22 @@ class GUI_timer(QWidget):
         # 타이머 시작
         self.timer.start()
 
-    def timeout(self):
-        currentTime = self.temp
-        self.temp -= 1
+    def timeout(self, dataset):
+        currentTime = dataset.interval_sec_per_set
+        dataset.interval_sec_per_set -= 1
         self.lcd.display(currentTime)
         
         # 타이머 종료
-        if self.temp < 0:
+        if dataset.interval_sec_per_set < 0:
             self.timer.stop()
             QCoreApplication.instance().quit()
 
 class GUI_result(QWidget):
-    def __init__(self):
+    def __init__(self, dataset):
         super().__init__()
-        self.setUI()
+        self.setUI(dataset)
 
-    def setUI(self):
+    def setUI(self, dataset):
         # 타이틀
         self.setWindowTitle('AI_Trainer')
         self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
@@ -362,7 +371,7 @@ class GUI_result(QWidget):
         self.setLayout(self.myLayout)
 
         # graph 생성
-        make_graph(AI_intance.incorrect_cnt, AI_intance.full_frames)
+        make_graph(dataset.incorrect_frames, dataset.full_frames)
 
         # 이미지 라벨
         label1 = QLabel(self)
@@ -380,7 +389,7 @@ class GUI_result(QWidget):
         height, width, channel = img.shape
         bytesPerLine = 3 * width
 
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(AI_intance.incorrect_cnt/AI_intance.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
+        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(dataset.incorrect_frames/dataset.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
         qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
         pixmap = QPixmap(qImg)
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
@@ -397,7 +406,7 @@ class GUI_result(QWidget):
         height, width, channel = img.shape
         bytesPerLine = 3 * width
 
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(AI_intance.incorrect_cnt/AI_intance.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
+        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(dataset.incorrect_frames/dataset.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
         qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
         pixmap = QPixmap(qImg)
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
@@ -414,7 +423,7 @@ class GUI_result(QWidget):
         height, width, channel = img.shape
         bytesPerLine = 3 * width
 
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(AI_intance.incorrect_cnt/AI_intance.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
+        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(dataset.incorrect_frames/dataset.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
         qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
         pixmap = QPixmap(qImg)
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
@@ -434,38 +443,51 @@ class GUI_result(QWidget):
 
         # 홈 버튼
         btn_home = QPushButton("Home")
-        btn_home.clicked.connect(self.Clicked_Replay_Button)
+        btn_home.clicked.connect(self.Clicked_Home_Button)
         self.myLayout.addWidget(btn_home, 3,6)
 
         self.show()
 
     def Clicked_Replay_Button(self):
-        print('1')
+        dataset.isReplay = True
+        print('리플레이 구현하기')
+        QCoreApplication.instance().quit()
 
     def Clicked_Home_Button(self):
-        print('2')
+        dataset.Home = True
+        QCoreApplication.instance().quit()
 
 
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
+    
+    dataset = GUI_data()
 
-    # 1차 GUI
-    mywindow_1 = GUI_form()
-    mywindow_1.show()
-    app.exec_()
-    mywindow_1.close()
+    while(dataset.Home):
+        # 변수 초기화
+        dataset.Home = False
 
-    if mywindow_1.isPressedConfirm == True:
-        # AI
-        # --code--
-        AI_intance = AI_Train()
-        AI_intance.run_pose_estimation("pushup_08", mywindow_1.goal_count, mywindow_1.goal_set)
-        
-        # 2차 GUI
-        mywindow_2 = GUI_result()
-        mywindow_2.show()
-        sys.exit(app.exec_())
+        # 1차 GUI
+        mywindow_1 = GUI_form(dataset)
+        mywindow_1.show()
+        app.exec_()
+        mywindow_1.close()
+
+        if dataset.isPressedConfirm == True:
+            # 변수 초기화
+            dataset.isPressedConfirm = False
+
+            # AI
+            AI_Train.run_pose_estimation("pushup_00", dataset)
+            
+            # 2차 GUI
+            mywindow_2 = GUI_result(dataset)
+            mywindow_2.show()
+            app.exec_()
+            mywindow_2.close()
+
+    sys.exit()
 
     '''
     추후 할 것
