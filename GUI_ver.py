@@ -20,9 +20,9 @@ from utils.WriteCSV import WriteCSV
 from utils.Pushup_Counting import Pushup_Counting
 from GUI.make_graph import make_graph
 
-# GUI_1 -> AI -> GUI_2
+# GUI_form -> AI -> GUI_result
 
-class GUI_1(QWidget):
+class GUI_form(QWidget):
     def __init__(self):
         super().__init__()
         self.weight = 60
@@ -114,90 +114,6 @@ class GUI_1(QWidget):
         self.weight = int(txt.text())
         self.isPressedConfirm = True
         QCoreApplication.instance().quit()
-
-class GUI_2(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setUI()
-
-    def setUI(self):
-        # 타이틀
-        self.setWindowTitle('AI_Trainer')
-        self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
-
-        # 창 사이즈 고정
-        self.setFixedSize(1280, 720)
-
-        # 레이아웃
-        self.myLayout = QGridLayout()
-        self.setLayout(self.myLayout)
-
-        # graph 생성
-        make_graph(AI_intance.incorrect_cnt, AI_intance.full_frames)
-
-        # 이미지 라벨
-        label1 = QLabel(self)
-        pixmap = QPixmap('./GUI/graph.png')
-        pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
-        label1.setPixmap(pixmap)
-        self.myLayout.addWidget(label1, 0,0, 2,2)
-
-        # 이미지 라벨
-        label3 = QLabel(self)
-
-        img = np.zeros((300, 300, 3), dtype=np.uint8)
-        img[:,:] = [240, 240, 240]
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, 360, (255, 255, 255), 20, 10)
-        height, width, channel = img.shape
-        bytesPerLine = 3 * width
-
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(AI_intance.incorrect_cnt/AI_intance.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
-        qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
-        pixmap = QPixmap(qImg)
-        pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
-        
-        label3.setPixmap(pixmap)
-        self.myLayout.addWidget(label3, 2,0, 2,2)
-
-        # 이미지 라벨
-        label33 = QLabel(self)
-
-        img = np.zeros((300, 300, 3), dtype=np.uint8)
-        img[:,:] = [240, 240, 240]
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, 360, (255, 0, 0), 18, 10)
-        height, width, channel = img.shape
-        bytesPerLine = 3 * width
-
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(AI_intance.incorrect_cnt/AI_intance.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
-        qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
-        pixmap = QPixmap(qImg)
-        pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
-        
-        label33.setPixmap(pixmap)
-        self.myLayout.addWidget(label33, 2,3, 2,4)
-
-        # 이미지 라벨
-        label333 = QLabel(self)
-
-        img = np.zeros((300, 300, 3), dtype=np.uint8)
-        img[:,:] = [240, 240, 240]
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, 360, (240, 240, 240), 20, 10)
-        height, width, channel = img.shape
-        bytesPerLine = 3 * width
-
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(AI_intance.incorrect_cnt/AI_intance.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
-        qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
-        pixmap = QPixmap(qImg)
-        pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
-        
-        label333.setPixmap(pixmap)
-        self.myLayout.addWidget(label333, 0,3, 2,4)
-
-        # 횟수 라벨
-        label4 = QLabel('결과 이미지 및 등등', self)
-        self.myLayout.addWidget(label4, 2,5)
-
-        self.show()
 
 class AI_Train():
 
@@ -428,12 +344,114 @@ class GUI_timer(QWidget):
             self.timer.stop()
             QCoreApplication.instance().quit()
 
+class GUI_result(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setUI()
+
+    def setUI(self):
+        # 타이틀
+        self.setWindowTitle('AI_Trainer')
+        self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
+
+        # 창 사이즈 고정
+        self.setFixedSize(1280, 720)
+
+        # 레이아웃
+        self.myLayout = QGridLayout()
+        self.setLayout(self.myLayout)
+
+        # graph 생성
+        make_graph(AI_intance.incorrect_cnt, AI_intance.full_frames)
+
+        # 이미지 라벨
+        label1 = QLabel(self)
+        pixmap = QPixmap('./GUI/graph.png')
+        pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
+        label1.setPixmap(pixmap)
+        self.myLayout.addWidget(label1, 0,0, 2,2)
+
+        # 이미지 라벨
+        label3 = QLabel(self)
+
+        img = np.zeros((300, 300, 3), dtype=np.uint8)
+        img[:,:] = [240, 240, 240]
+        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, 360, (255, 255, 255), 20, 10)
+        height, width, channel = img.shape
+        bytesPerLine = 3 * width
+
+        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(AI_intance.incorrect_cnt/AI_intance.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
+        qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
+        pixmap = QPixmap(qImg)
+        pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
+        
+        label3.setPixmap(pixmap)
+        self.myLayout.addWidget(label3, 2,0, 2,2)
+
+        # 이미지 라벨
+        label33 = QLabel(self)
+
+        img = np.zeros((300, 300, 3), dtype=np.uint8)
+        img[:,:] = [240, 240, 240]
+        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, 360, (255, 0, 0), 18, 10)
+        height, width, channel = img.shape
+        bytesPerLine = 3 * width
+
+        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(AI_intance.incorrect_cnt/AI_intance.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
+        qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
+        pixmap = QPixmap(qImg)
+        pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
+        
+        label33.setPixmap(pixmap)
+        self.myLayout.addWidget(label33, 2,3, 2,4)
+
+        # 이미지 라벨
+        label333 = QLabel(self)
+
+        img = np.zeros((300, 300, 3), dtype=np.uint8)
+        img[:,:] = [240, 240, 240]
+        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, 360, (240, 240, 240), 20, 10)
+        height, width, channel = img.shape
+        bytesPerLine = 3 * width
+
+        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(AI_intance.incorrect_cnt/AI_intance.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
+        qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
+        pixmap = QPixmap(qImg)
+        pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
+        
+        label333.setPixmap(pixmap)
+        self.myLayout.addWidget(label333, 0,3, 2,4)
+
+        # 횟수 라벨
+        label4 = QLabel('결과 이미지 및 등등', self)
+        self.myLayout.addWidget(label4, 2,5)
+
+
+        # 다시 시작 버튼
+        btn_replay = QPushButton("RePlay")
+        btn_replay.clicked.connect(self.Clicked_Replay_Button)
+        self.myLayout.addWidget(btn_replay, 3,5)
+
+        # 홈 버튼
+        btn_home = QPushButton("Home")
+        btn_home.clicked.connect(self.Clicked_Replay_Button)
+        self.myLayout.addWidget(btn_home, 3,6)
+
+        self.show()
+
+    def Clicked_Replay_Button(self):
+        print('1')
+
+    def Clicked_Home_Button(self):
+        print('2')
+
+
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
 
     # 1차 GUI
-    mywindow_1 = GUI_1()
+    mywindow_1 = GUI_form()
     mywindow_1.show()
     app.exec_()
     mywindow_1.close()
@@ -445,7 +463,7 @@ if __name__ == '__main__':
         AI_intance.run_pose_estimation("pushup_08", mywindow_1.goal_count, mywindow_1.goal_set)
         
         # 2차 GUI
-        mywindow_2 = GUI_2()
+        mywindow_2 = GUI_result()
         mywindow_2.show()
         sys.exit(app.exec_())
 
