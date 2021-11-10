@@ -306,6 +306,8 @@ class AI_Train():
 class GUI_timer(QWidget):
     def __init__(self, dataset):
         super().__init__()
+        self.lcd = QLCDNumber()
+        self.interval_time = dataset.interval_sec_per_set
         self.setUI(dataset)
 
     def setUI(self, dataset):
@@ -324,17 +326,18 @@ class GUI_timer(QWidget):
 
         # 1000ms마다 timeout실행
         self.timer.setInterval(1000)
-        self.timer.timeout.connect(self.timeout)
+        self.timer.timeout.connect(lambda: self.timeout(dataset))
+        
  
         # LCD객체 생성
-        self.lcd = QLCDNumber()
+        #self.lcd = QLCDNumber()
 
         # 글씨 칸 조절
         self.lcd.setDigitCount(3)
 
         # LCD에 숫자 띄우기 (숫자 맞추기 위해 -1 실행)
-        self.lcd.display(dataset.interval_sec_per_set)
-        dataset.interval_sec_per_set -= 1
+        self.lcd.display(self.interval_time)
+        self.interval_time -= 1
         
         # 레이아웃에 따른 위치 설정
         self.mylayout.addWidget(self.lcd)
@@ -344,12 +347,12 @@ class GUI_timer(QWidget):
         self.timer.start()
 
     def timeout(self, dataset):
-        currentTime = dataset.interval_sec_per_set
-        dataset.interval_sec_per_set -= 1
+        currentTime = self.interval_time
+        self.interval_time -= 1
         self.lcd.display(currentTime)
         
         # 타이머 종료
-        if dataset.interval_sec_per_set < 0:
+        if self.interval_time < 0:
             self.timer.stop()
             QCoreApplication.instance().quit()
 
@@ -457,7 +460,6 @@ class GUI_result(QWidget):
         dataset.Home = True
         QCoreApplication.instance().quit()
 
-
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
@@ -478,9 +480,18 @@ if __name__ == '__main__':
             # 변수 초기화
             dataset.isPressedConfirm = False
 
-            # AI
-            AI_Train.run_pose_estimation("pushup_00", dataset)
+            for i in range(dataset.goal_set):
+                # AI
+                AI_Train.run_pose_estimation("pushup_18", dataset)
             
+                # 마지막 세트 이후엔 쉬는시간 X
+                if i < (dataset.goal_set-1):
+                    # Timer
+                    Timer = GUI_timer(dataset)
+                    Timer.show()
+                    app.exec_()
+                    Timer.close()
+
             # 2차 GUI
             mywindow_2 = GUI_result(dataset)
             mywindow_2.show()
@@ -501,7 +512,6 @@ if __name__ == '__main__':
         1) 칼로리 출력
         2) 정확도 출력
         3) 다시보기
-        4) 홈 버튼? <- 선택
 
     3. 다시보기 버튼 실행 시 영상 보여주기
         -> 타이머로 끊으면 모든 세트에 해당하는 영상을 봐야하나?????
