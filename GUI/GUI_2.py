@@ -7,8 +7,9 @@ import numpy as np
 import cv2
 from time import sleep
 
+from make_graph import make_graph
+
 class GUI_2(QWidget):
-    
     def __init__(self):
         super().__init__()
         self.setUI()
@@ -25,16 +26,16 @@ class GUI_2(QWidget):
         self.myLayout = QGridLayout()
         self.setLayout(self.myLayout)
 
+        # graph 생성
+        #make_graph(AI_intance.incorrect_cnt, AI_intance.full_frmes)
+        make_graph(12,100)
+
         # 이미지 라벨
         label1 = QLabel(self)
         pixmap = QPixmap('./GUI/graph.png')
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
         label1.setPixmap(pixmap)
         self.myLayout.addWidget(label1, 0,0, 2,2)
-
-        # 설명 라벨
-        label2 = QLabel('결과 이미지 및 등등', self)
-        self.myLayout.addWidget(label2, 0,2)
 
         # 이미지 라벨
         label3 = QLabel(self)
