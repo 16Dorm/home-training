@@ -35,6 +35,9 @@ class GUI_data():
         self.full_frames = 0
         self.incorrect_frames = 0
 
+        self.full_frames_total = 0
+        self.incorrect_frames_total = 0
+
         # GUI_Timer
         self.interval_sec_per_set = 10
 
@@ -316,10 +319,20 @@ class GUI_timer(QWidget):
         self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
 
         # 창 사이즈 고정
-        self.setFixedSize(320, 250)
+        self.setFixedSize(308, 600)
 
         # 레이아웃 설정
         self.mylayout = QVBoxLayout()
+
+        # graph 생성
+        make_graph(dataset.incorrect_frames, dataset.full_frames)
+
+        # 정확도 그래프 출력
+        label1 = QLabel(self)
+        pixmap = QPixmap('./GUI/graph.png')
+        pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
+        label1.setPixmap(pixmap)
+        self.mylayout.addWidget(label1)
 
         # 타이머 생성
         self.timer = QTimer(self)
@@ -341,7 +354,7 @@ class GUI_timer(QWidget):
         
         # 레이아웃에 따른 위치 설정
         self.mylayout.addWidget(self.lcd)
-        self.setLayout(self.mylayout) 
+        self.setLayout(self.mylayout)
 
         # 타이머 시작
         self.timer.start()
@@ -374,7 +387,7 @@ class GUI_result(QWidget):
         self.setLayout(self.myLayout)
 
         # graph 생성
-        make_graph(dataset.incorrect_frames, dataset.full_frames)
+        make_graph(dataset.incorrect_frames_total, dataset.full_frames_total)
 
         # 이미지 라벨
         label1 = QLabel(self)
@@ -392,7 +405,7 @@ class GUI_result(QWidget):
         height, width, channel = img.shape
         bytesPerLine = 3 * width
 
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(dataset.incorrect_frames/dataset.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
+        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(dataset.incorrect_frames_total/dataset.full_frames_total)) * 100)*3.6, (150, 250, 0), 20, 10)
         qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
         pixmap = QPixmap(qImg)
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
@@ -409,7 +422,7 @@ class GUI_result(QWidget):
         height, width, channel = img.shape
         bytesPerLine = 3 * width
 
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(dataset.incorrect_frames/dataset.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
+        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(dataset.incorrect_frames_total/dataset.full_frames_total)) * 100)*3.6, (150, 250, 0), 20, 10)
         qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
         pixmap = QPixmap(qImg)
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
@@ -426,7 +439,7 @@ class GUI_result(QWidget):
         height, width, channel = img.shape
         bytesPerLine = 3 * width
 
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(dataset.incorrect_frames/dataset.full_frames)) * 100)*3.6, (150, 250, 0), 20, 10)
+        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(dataset.incorrect_frames_total/dataset.full_frames_total)) * 100)*3.6, (150, 250, 0), 20, 10)
         qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
         pixmap = QPixmap(qImg)
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
@@ -491,6 +504,12 @@ if __name__ == '__main__':
                     Timer.show()
                     app.exec_()
                     Timer.close()
+                
+                # 정확도 graph 업데이트/초기화
+                dataset.full_frames_total += dataset.full_frames
+                dataset.incorrect_frames_total += dataset.incorrect_frames
+                dataset.full_frames = 0
+                dataset.incorrect_frames = 0
 
             # 2차 GUI
             mywindow_2 = GUI_result(dataset)
