@@ -5,7 +5,6 @@ import mediapipe as mp
 import time
 import math #angle을 구하기위해서 사용
 
-
 #클래스 선언
 class poseDetector():
     def __init__(self, video_name, mode=False, upBody=False,smooth=True,
