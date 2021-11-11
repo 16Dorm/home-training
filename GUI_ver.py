@@ -58,7 +58,6 @@ class GUI_form(QWidget):
         # 창 사이즈 고정
         # self.resize(1280, 720)
         self.setFixedSize(320, 250)
-        #self.setFixedSize(1280, 720)
 
         # 레이아웃
         self.myLayout = QGridLayout()
@@ -114,9 +113,21 @@ class GUI_form(QWidget):
         combo2.activated[str].connect(lambda :self.selectedComboItem(combo2, "set", dataset))
         self.myLayout.addWidget(combo2, 4,1)
 
+        # 몸무게 라벨
+        label_interval = QLabel('쉬는 시간을 입력해 주세요.', self)
+        self.myLayout.addWidget(label_interval, 5,0)
+
+        # 세트 콤보박스
+        # 몸무게 텍스트박스
+        lineedit2 = QLineEdit(self)
+        lineedit2.setText(str(dataset.interval_sec_per_set))
+        lineedit2.setValidator(self.onlyInt)
+        self.myLayout.addWidget(lineedit2, 5,1)
+
+
         # 확인 버튼
         button1 = QPushButton('확인', self)
-        self.myLayout.addWidget(button1, 4,2)
+        self.myLayout.addWidget(button1, 5,2)
         button1.clicked.connect(lambda: self.btnClickedEvent(lineedit1))
 
     def selectedComboItem(self,text,type, dataset):
@@ -131,6 +142,7 @@ class GUI_form(QWidget):
 
     def btnClickedEvent(self, txt):
         dataset.weight = int(txt.text())
+        dataset.interval_sec_per_set = int(txt.text())
         dataset.isPressedConfirm = True
         QCoreApplication.instance().quit()
 
