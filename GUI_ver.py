@@ -128,7 +128,7 @@ class GUI_form(QWidget):
         # 확인 버튼
         button1 = QPushButton('확인', self)
         self.myLayout.addWidget(button1, 5,2)
-        button1.clicked.connect(lambda: self.btnClickedEvent(lineedit1))
+        button1.clicked.connect(lambda: self.btnClickedEvent(lineedit1, lineedit2))
 
     def selectedComboItem(self,text,type, dataset):
         if type == "cnt":
@@ -140,9 +140,9 @@ class GUI_form(QWidget):
         else:
             print("combobox type check error")
 
-    def btnClickedEvent(self, txt):
-        dataset.weight = int(txt.text())
-        dataset.interval_sec_per_set = int(txt.text())
+    def btnClickedEvent(self, weight_txt, interval_txt):
+        dataset.weight = int(weight_txt.text())
+        dataset.interval_sec_per_set = int(interval_txt.text())
         dataset.isPressedConfirm = True
         QCoreApplication.instance().quit()
 
@@ -507,7 +507,7 @@ if __name__ == '__main__':
 
             for i in range(dataset.goal_set):
                 # AI
-                AI_Train.run_pose_estimation("pushup_18", dataset)
+                AI_Train.run_pose_estimation("pushup_00", dataset)
             
                 # 마지막 세트 이후엔 쉬는시간 X
                 if i < (dataset.goal_set-1):
