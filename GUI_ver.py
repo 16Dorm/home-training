@@ -38,6 +38,8 @@ class GUI_data():
         self.full_frames_total = 0
         self.incorrect_frames_total = 0
 
+        self.cur_set_num = 0
+
         # GUI_Timer
         self.interval_sec_per_set = 10
 
@@ -128,7 +130,7 @@ class GUI_form(QWidget):
         # 확인 버튼
         button1 = QPushButton('확인', self)
         self.myLayout.addWidget(button1, 5,2)
-        button1.clicked.connect(lambda: self.btnClickedEvent(lineedit1))
+        button1.clicked.connect(lambda: self.btnClickedEvent(lineedit1, lineedit2))
 
     def selectedComboItem(self,text,type, dataset):
         if type == "cnt":
@@ -140,20 +142,28 @@ class GUI_form(QWidget):
         else:
             print("combobox type check error")
 
-    def btnClickedEvent(self, txt):
-        dataset.weight = int(txt.text())
-        dataset.interval_sec_per_set = int(txt.text())
+    def btnClickedEvent(self, weight_txt, interval_txt):
+        dataset.weight = int(weight_txt.text())
+        dataset.interval_sec_per_set = int(interval_txt.text())
         dataset.isPressedConfirm = True
         QCoreApplication.instance().quit()
 
 class AI_Train():
     def run_pose_estimation(video_name, dataset):
-        
+
         print(dataset.weight, dataset.goal_cnt, dataset.goal_set)
         
         cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
         #cap=cv2.VideoCapture(0) #카메라 번호
         
+        # 동영상으로 저장하기 위한 코드
+        w = 1280#round(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        h = 720#round(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        fps = cap.get(cv2.CAP_PROP_FPS) # 카메라에 따라 값이 정상적, 비정상적
+        print(w,h, fps)
+        fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+        out = cv2.VideoWriter('output_' + str(dataset.cur_set_num) + '.avi', fourcc, fps, (w, h))
+
         # 사전 준비시간을 label0으로 잘라내기 위한 작업
         with open('video_list.txt', 'r') as infile:
             data = infile.readlines()
@@ -190,14 +200,14 @@ class AI_Train():
         detector =pm.poseDetector(video_name)
 
         while True:
-            success, img =cap.read()
+            success, img = cap.read()
             if not success:
                 break
             img = cv2.resize(img, (1280,720)) #영상의 크기 조절, 프레임 조절할 수 있다
             black_img = np.zeros((480, 640, 3), dtype=np.uint8) ##데이터 저장용 검은배경 이미지 생성
             # img = cv2.imread("2.PNG")  # 각도를 얻기 위한 이미지 각도를 얻고 주석
             # 이후에 할일은 포즈 모듈을 가져와야함 포즈 모듈로 각도 재기
-            
+
             img = detector.findPose(img, black_img, index, False) #false를 해서 우리가 보고자하는 점 외에는 다 제거
             index += 1
             lmList = detector.findPosition(img, False) #그리기를 원하지 않으므로 false
@@ -306,8 +316,11 @@ class AI_Train():
 
             # 최종 출력
             cv2.imshow("Image",img)
-            cv2.waitKey(1) 
+            cv2.waitKey(1)
 
+            # 동영상저장
+            out.write(img)
+            
         #final_max=[max(head),max(shoulder),max(elbow),max(hand),max(hip),max(foot)]
         #final_min=[min(head),min(shoulder),min(elbow),min(hand),min(hip),min(foot)]
         #print(f"final_max: {final_max}")
@@ -316,6 +329,7 @@ class AI_Train():
         # WriteCSV 제거
         #writecsv = WriteCSV('./dataset/train/', "train.csv", label_list, keypoint_list, video_name)
         #writecsv.merge_train_csv()
+        out.release()
         cv2.destroyAllWindows()
 
 class GUI_timer(QWidget):
@@ -336,12 +350,9 @@ class GUI_timer(QWidget):
         # 레이아웃 설정
         self.mylayout = QVBoxLayout()
 
-        # graph 생성
-        make_graph(dataset.incorrect_frames, dataset.full_frames)
-
         # 정확도 그래프 출력
         label1 = QLabel(self)
-        pixmap = QPixmap('./GUI/graph.png')
+        pixmap = QPixmap('./GUI/graph_' + str(dataset.cur_set_num) + '.png')
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
         label1.setPixmap(pixmap)
         self.mylayout.addWidget(label1)
@@ -352,10 +363,6 @@ class GUI_timer(QWidget):
         # 1000ms마다 timeout실행
         self.timer.setInterval(1000)
         self.timer.timeout.connect(lambda: self.timeout(dataset))
-        
- 
-        # LCD객체 생성
-        #self.lcd = QLCDNumber()
 
         # 글씨 칸 조절
         self.lcd.setDigitCount(3)
@@ -399,11 +406,11 @@ class GUI_result(QWidget):
         self.setLayout(self.myLayout)
 
         # graph 생성
-        make_graph(dataset.incorrect_frames_total, dataset.full_frames_total)
+        make_graph(dataset.incorrect_frames_total, dataset.full_frames_total, 'total')
 
         # 이미지 라벨
         label1 = QLabel(self)
-        pixmap = QPixmap('./GUI/graph.png')
+        pixmap = QPixmap('./GUI/graph_' + '0' + '.png')
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
         label1.setPixmap(pixmap)
         self.myLayout.addWidget(label1, 0,0, 2,2)
@@ -507,7 +514,10 @@ if __name__ == '__main__':
 
             for i in range(dataset.goal_set):
                 # AI
-                AI_Train.run_pose_estimation("pushup_18", dataset)
+                AI_Train.run_pose_estimation("pushup_00", dataset)
+
+                # graph 생성
+                make_graph(dataset.incorrect_frames, dataset.full_frames, dataset.cur_set_num)
             
                 # 마지막 세트 이후엔 쉬는시간 X
                 if i < (dataset.goal_set-1):
@@ -522,6 +532,9 @@ if __name__ == '__main__':
                 dataset.incorrect_frames_total += dataset.incorrect_frames
                 dataset.full_frames = 0
                 dataset.incorrect_frames = 0
+
+                # 현재 set 카운트
+                dataset.cur_set_num += 1
 
             # 2차 GUI
             mywindow_2 = GUI_result(dataset)

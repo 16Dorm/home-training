@@ -4,7 +4,7 @@ import numpy as np
 from matplotlib import font_manager, rc
 from matplotlib import style
 
-def make_graph(wrong_frames, full_frames):
+def make_graph(wrong_frames, full_frames, num):
 
     wrong_per = round((wrong_frames/full_frames)*100, 2)
     correct_per = 100 - wrong_per
@@ -20,5 +20,5 @@ def make_graph(wrong_frames, full_frames):
 
     plt.figure(figsize=(4,4))
     plt.pie(ratio, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=90, textprops={'fontsize': 14})
-    plt.savefig('./GUI/graph.png', transparent=True, bbox_inches='tight', pad_inches=0)
+    plt.savefig('./GUI/graph_'+ str(num) +'.png', transparent=True, bbox_inches='tight', pad_inches=0)
     #plt.show()
