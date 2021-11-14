@@ -38,6 +38,8 @@ class GUI_data():
         self.full_frames_total = 0
         self.incorrect_frames_total = 0
 
+        self.cur_set_num = 0
+
         # GUI_Timer
         self.interval_sec_per_set = 10
 
@@ -160,7 +162,7 @@ class AI_Train():
         fps = cap.get(cv2.CAP_PROP_FPS) # 카메라에 따라 값이 정상적, 비정상적
         print(w,h, fps)
         fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-        out = cv2.VideoWriter('output.avi', fourcc, fps, (w, h))
+        out = cv2.VideoWriter('output_' + str(dataset.cur_set_num) + '.avi', fourcc, fps, (w, h))
 
         # 사전 준비시간을 label0으로 잘라내기 위한 작업
         with open('video_list.txt', 'r') as infile:
@@ -348,12 +350,9 @@ class GUI_timer(QWidget):
         # 레이아웃 설정
         self.mylayout = QVBoxLayout()
 
-        # graph 생성
-        make_graph(dataset.incorrect_frames, dataset.full_frames)
-
         # 정확도 그래프 출력
         label1 = QLabel(self)
-        pixmap = QPixmap('./GUI/graph.png')
+        pixmap = QPixmap('./GUI/graph_' + str(dataset.cur_set_num) + '.png')
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
         label1.setPixmap(pixmap)
         self.mylayout.addWidget(label1)
@@ -364,10 +363,6 @@ class GUI_timer(QWidget):
         # 1000ms마다 timeout실행
         self.timer.setInterval(1000)
         self.timer.timeout.connect(lambda: self.timeout(dataset))
-        
- 
-        # LCD객체 생성
-        #self.lcd = QLCDNumber()
 
         # 글씨 칸 조절
         self.lcd.setDigitCount(3)
@@ -411,11 +406,11 @@ class GUI_result(QWidget):
         self.setLayout(self.myLayout)
 
         # graph 생성
-        make_graph(dataset.incorrect_frames_total, dataset.full_frames_total)
+        make_graph(dataset.incorrect_frames_total, dataset.full_frames_total, 'total')
 
         # 이미지 라벨
         label1 = QLabel(self)
-        pixmap = QPixmap('./GUI/graph.png')
+        pixmap = QPixmap('./GUI/graph_' + '0' + '.png')
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
         label1.setPixmap(pixmap)
         self.myLayout.addWidget(label1, 0,0, 2,2)
@@ -520,6 +515,9 @@ if __name__ == '__main__':
             for i in range(dataset.goal_set):
                 # AI
                 AI_Train.run_pose_estimation("pushup_00", dataset)
+
+                # graph 생성
+                make_graph(dataset.incorrect_frames, dataset.full_frames, dataset.cur_set_num)
             
                 # 마지막 세트 이후엔 쉬는시간 X
                 if i < (dataset.goal_set-1):
@@ -534,6 +532,9 @@ if __name__ == '__main__':
                 dataset.incorrect_frames_total += dataset.incorrect_frames
                 dataset.full_frames = 0
                 dataset.incorrect_frames = 0
+
+                # 현재 set 카운트
+                dataset.cur_set_num += 1
 
             # 2차 GUI
             mywindow_2 = GUI_result(dataset)
