@@ -467,8 +467,8 @@ class GUI_result(QWidget):
         self.myLayout.addWidget(label333, 0,3, 2,4)
 
         # 횟수 라벨
-        label4 = QLabel('결과 이미지 및 등등', self)
-        self.myLayout.addWidget(label4, 2,5)
+        #label4 = QLabel('결과 이미지 및 등등', self)
+        #self.myLayout.addWidget(label4, 2,5)
 
 
         # 다시 시작 버튼
@@ -480,6 +480,28 @@ class GUI_result(QWidget):
         btn_home = QPushButton("Home")
         btn_home.clicked.connect(self.Clicked_Home_Button)
         self.myLayout.addWidget(btn_home, 3,6)
+
+
+        # 칼로리 계산 (100개 기준 몸무게 당 칼로리)
+        if(dataset.weight <= 60):
+            cal = 28000
+        elif(dataset.weight <= 70):
+            cal = 34000
+        elif(dataset.weight <=80):
+            cal = 41000
+        elif(dataset.weight <=90):
+            cal = 49000
+        else:
+            cal = 59000
+
+        
+        
+        result_cnt = dataset.goal_cnt * dataset.goal_set
+        cal = cal * (result_cnt /100)
+        kcal = cal / 1000
+
+        label4 = QLabel('사용자의 몸무게 ' + str(dataset.weight) + 'kg으로 총 ' + str(result_cnt) + '번 팔굽혀펴기 결과 소모된 칼로리는 ' + str(kcal) + 'kcal입니다. ', self)
+        self.myLayout.addWidget(label4, 2,5)
 
         self.show()
 

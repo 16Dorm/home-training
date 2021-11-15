@@ -67,26 +67,6 @@ class GUI_2(QWidget):
         label4 = QLabel('결과 이미지 및 등등', self)
         self.myLayout.addWidget(label4, 2,2)
 
-        # 칼로리 계산
-        # 푸쉬업 카운트 어디서 받아옴?push_up_cnt = 0
-        # 사용자 몸무게 입력 user_weight
-
-        # if(user_weight <= 60)
-            # cal = 28000
-        # else if(user_weight <= 70)
-            # cal = 34000
-        # else if(user_weight <=80)
-            # cal = 41000
-        # else if(user_weight <=90)
-            # cal = 49000
-        # else
-            # cal = 59000
-
-        #kcal = cal / 1000;
-
-        
-
-
         self.show()
 
 if __name__ == '__main__':
