@@ -5,7 +5,8 @@ __pycache__
 image/
 wandb/
 results/
-!play_results/.keep
+
+!.gitignore
 
 video_name.txt
 
