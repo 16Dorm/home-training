@@ -26,6 +26,10 @@ conda activate home-training
 pip install mediapipe==0.8.2
 pip install sklearn
 pip install pandas
+pip install pillow
+pip install pyqt5
+pip install matplotlib
+conda install pytorch
 ```
 
 ```
