@@ -20,5 +20,6 @@ def make_graph(wrong_frames, full_frames, num):
 
     plt.figure(figsize=(4,4))
     plt.pie(ratio, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=90, textprops={'fontsize': 14})
-    plt.savefig('./GUI/graph_'+ str(num) +'.png', transparent=True, bbox_inches='tight', pad_inches=0)
+    # plt.savefig('./GUI/graph_'+ str(num) +'.png', transparent=True, bbox_inches='tight', pad_inches=0)
+    plt.savefig('./play_results/graph_'+ str(num) +'.png', transparent=True, bbox_inches='tight', pad_inches=0)
     #plt.show()

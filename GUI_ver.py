@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from time import sleep
-
+import os
 # AI
 from numpy.core import fromnumeric
 from classification_model.SupervisedLearning import classification
@@ -46,6 +46,7 @@ class GUI_data():
         # GUI_result
         self.Home = True
         self.isReplay = False
+        self.Exit = True
 
 class GUI_form(QWidget):
     def __init__(self, dataset):
@@ -131,6 +132,7 @@ class GUI_form(QWidget):
         button1 = QPushButton('확인', self)
         self.myLayout.addWidget(button1, 5,2)
         button1.clicked.connect(lambda: self.btnClickedEvent(lineedit1, lineedit2))
+        
 
     def selectedComboItem(self,text,type, dataset):
         if type == "cnt":
@@ -152,9 +154,10 @@ class AI_Train():
     def run_pose_estimation(video_name, dataset):
 
         print(dataset.weight, dataset.goal_cnt, dataset.goal_set)
-        
+       
         cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
         #cap=cv2.VideoCapture(0) #카메라 번호
+       
         
         # 동영상으로 저장하기 위한 코드
         w = 1280#round(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -162,7 +165,7 @@ class AI_Train():
         fps = cap.get(cv2.CAP_PROP_FPS) # 카메라에 따라 값이 정상적, 비정상적
         print(w,h, fps)
         fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-        out = cv2.VideoWriter('output_' + str(dataset.cur_set_num) + '.avi', fourcc, fps, (w, h))
+        out = cv2.VideoWriter('./play_results/output_' + str(dataset.cur_set_num) + '.avi', fourcc, fps, (w, h))
 
         # 사전 준비시간을 label0으로 잘라내기 위한 작업
         with open('video_list.txt', 'r') as infile:
@@ -352,7 +355,8 @@ class GUI_timer(QWidget):
 
         # 정확도 그래프 출력
         label1 = QLabel(self)
-        pixmap = QPixmap('./GUI/graph_' + str(dataset.cur_set_num) + '.png')
+        # pixmap = QPixmap('./GUI/graph_' + str(dataset.cur_set_num) + '.png')
+        pixmap = QPixmap('./play_results/graph_' + str(dataset.cur_set_num) + '.png')
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
         label1.setPixmap(pixmap)
         self.mylayout.addWidget(label1)
@@ -480,6 +484,12 @@ class GUI_result(QWidget):
         btn_home = QPushButton("Home")
         btn_home.clicked.connect(self.Clicked_Home_Button)
         self.myLayout.addWidget(btn_home, 3,6)
+        
+        # 종료 버튼
+        btn_exit = QPushButton("Exit")
+        btn_exit.clicked.connect(self.Clicked_Exit_Button)
+        self.myLayout.addWidget(btn_exit,3,7)
+       
 
 
         # 칼로리 계산 (100개 기준 몸무게 당 칼로리)
@@ -513,7 +523,25 @@ class GUI_result(QWidget):
     def Clicked_Home_Button(self):
         dataset.Home = True
         QCoreApplication.instance().quit()
-
+        filePath='./play_results'
+        if os.path.exists(filePath):
+            for file in os.scandir(filePath):
+                os.remove(file.path)
+            print("Remove All file")
+        else:
+            print("Directory Not found")
+    
+    def Clicked_Exit_Button(self):
+        dataset.Exit = True
+        QCoreApplication.instance().quit()
+        filePath='./play_results'
+        if os.path.exists(filePath):
+            for file in os.scandir(filePath):
+                os.remove(file.path)
+            print("Remove All file")
+        else:
+            print("Directory Not found")
+        
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
@@ -565,7 +593,6 @@ if __name__ == '__main__':
             mywindow_2.close()
 
     sys.exit()
-
     '''
     추후 할 것
 
