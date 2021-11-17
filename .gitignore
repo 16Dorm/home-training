@@ -6,9 +6,10 @@ image/
 wandb/
 results/
 
-!.gitignore
+play_results\.gitignore
 
 video_name.txt
 
 # 테스트 파일
 test*.py
+!play_results/.gitkeep
