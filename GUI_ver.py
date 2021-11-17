@@ -414,83 +414,25 @@ class GUI_result(QWidget):
 
         # 이미지 라벨
         label1 = QLabel(self)
-        pixmap = QPixmap('./GUI/graph_' + '0' + '.png')
+        pixmap = QPixmap('./play_results/graph_total.png')
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
         label1.setPixmap(pixmap)
         self.myLayout.addWidget(label1, 0,0, 2,2)
 
-        # 이미지 라벨
-        label3 = QLabel(self)
-
-        img = np.zeros((300, 300, 3), dtype=np.uint8)
-        img[:,:] = [240, 240, 240]
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, 360, (255, 255, 255), 20, 10)
-        height, width, channel = img.shape
-        bytesPerLine = 3 * width
-
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(dataset.incorrect_frames_total/dataset.full_frames_total)) * 100)*3.6, (150, 250, 0), 20, 10)
-        qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
-        pixmap = QPixmap(qImg)
-        pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
-        
-        label3.setPixmap(pixmap)
-        self.myLayout.addWidget(label3, 2,0, 2,2)
-
-        # 이미지 라벨
-        label33 = QLabel(self)
-
-        img = np.zeros((300, 300, 3), dtype=np.uint8)
-        img[:,:] = [240, 240, 240]
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, 360, (255, 0, 0), 18, 10)
-        height, width, channel = img.shape
-        bytesPerLine = 3 * width
-
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(dataset.incorrect_frames_total/dataset.full_frames_total)) * 100)*3.6, (150, 250, 0), 20, 10)
-        qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
-        pixmap = QPixmap(qImg)
-        pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
-        
-        label33.setPixmap(pixmap)
-        self.myLayout.addWidget(label33, 2,3, 2,4)
-
-        # 이미지 라벨
-        label333 = QLabel(self)
-
-        img = np.zeros((300, 300, 3), dtype=np.uint8)
-        img[:,:] = [240, 240, 240]
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, 360, (240, 240, 240), 20, 10)
-        height, width, channel = img.shape
-        bytesPerLine = 3 * width
-
-        img = cv2.ellipse(img, (150,150), (110,110), 270, 0, ((1-(dataset.incorrect_frames_total/dataset.full_frames_total)) * 100)*3.6, (150, 250, 0), 20, 10)
-        qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
-        pixmap = QPixmap(qImg)
-        pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
-        
-        label333.setPixmap(pixmap)
-        self.myLayout.addWidget(label333, 0,3, 2,4)
-
-        # 횟수 라벨
-        #label4 = QLabel('결과 이미지 및 등등', self)
-        #self.myLayout.addWidget(label4, 2,5)
-
-
         # 다시 시작 버튼
         btn_replay = QPushButton("RePlay")
         btn_replay.clicked.connect(self.Clicked_Replay_Button)
-        self.myLayout.addWidget(btn_replay, 3,5)
+        self.myLayout.addWidget(btn_replay, 3,0)
 
         # 홈 버튼
         btn_home = QPushButton("Home")
         btn_home.clicked.connect(self.Clicked_Home_Button)
-        self.myLayout.addWidget(btn_home, 3,6)
+        self.myLayout.addWidget(btn_home, 3,1)
         
         # 종료 버튼
         btn_exit = QPushButton("Exit")
         btn_exit.clicked.connect(self.Clicked_Exit_Button)
-        self.myLayout.addWidget(btn_exit,3,7)
-       
-
+        self.myLayout.addWidget(btn_exit,3,2)
 
         # 칼로리 계산 (100개 기준 몸무게 당 칼로리)
         if(dataset.weight <= 60):
@@ -503,15 +445,13 @@ class GUI_result(QWidget):
             cal = 49000
         else:
             cal = 59000
-
-        
         
         result_cnt = dataset.goal_cnt * dataset.goal_set
         cal = cal * (result_cnt /100)
         kcal = cal / 1000
 
         label4 = QLabel('사용자의 몸무게 ' + str(dataset.weight) + 'kg으로 총 ' + str(result_cnt) + '번 팔굽혀펴기 결과 소모된 칼로리는 ' + str(kcal) + 'kcal입니다. ', self)
-        self.myLayout.addWidget(label4, 2,5)
+        self.myLayout.addWidget(label4, 2,0)
 
         self.show()
 
