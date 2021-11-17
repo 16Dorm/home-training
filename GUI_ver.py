@@ -44,6 +44,7 @@ class GUI_data():
         self.interval_sec_per_set = 10
 
         # GUI_result
+        self.want_replay_set = 0
         self.Home = True
         self.isReplay = False
         self.Exit = True
@@ -402,11 +403,13 @@ class GUI_result(QWidget):
         self.setWindowTitle('AI_Trainer')
         self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
 
-        # 창 사이즈 고정
-        self.setFixedSize(1280, 720)
+        # # 창 사이즈 고정
+        self.setFixedSize(308, 500)
 
         # 레이아웃
-        self.myLayout = QGridLayout()
+        # QVBoxLayout()
+        self.myLayout = QVBoxLayout()
+        self.myMiniLayout = QGridLayout()
         self.setLayout(self.myLayout)
 
         # graph 생성
@@ -417,22 +420,7 @@ class GUI_result(QWidget):
         pixmap = QPixmap('./play_results/graph_total.png')
         pixmap =pixmap.scaled(int(pixmap.width()),int(pixmap.height()))
         label1.setPixmap(pixmap)
-        self.myLayout.addWidget(label1, 0,0, 2,2)
-
-        # 다시 시작 버튼
-        btn_replay = QPushButton("RePlay")
-        btn_replay.clicked.connect(self.Clicked_Replay_Button)
-        self.myLayout.addWidget(btn_replay, 3,0)
-
-        # 홈 버튼
-        btn_home = QPushButton("Home")
-        btn_home.clicked.connect(self.Clicked_Home_Button)
-        self.myLayout.addWidget(btn_home, 3,1)
-        
-        # 종료 버튼
-        btn_exit = QPushButton("Exit")
-        btn_exit.clicked.connect(self.Clicked_Exit_Button)
-        self.myLayout.addWidget(btn_exit,3,2)
+        self.myLayout.addWidget(label1)
 
         # 칼로리 계산 (100개 기준 몸무게 당 칼로리)
         if(dataset.weight <= 60):
@@ -450,13 +438,48 @@ class GUI_result(QWidget):
         cal = cal * (result_cnt /100)
         kcal = cal / 1000
 
-        label4 = QLabel('사용자의 몸무게 ' + str(dataset.weight) + 'kg으로 총 ' + str(result_cnt) + '번 팔굽혀펴기 결과 소모된 칼로리는 ' + str(kcal) + 'kcal입니다. ', self)
-        self.myLayout.addWidget(label4, 2,0)
+        label4 = QLabel('사용자의 몸무게 ' + str(dataset.weight) + 'kg으로')
+        label5 = QLabel('총 ' + str(result_cnt) + '번 팔굽혀펴기 결과,')
+        label6 = QLabel('소모된 칼로리는 ' + str(kcal) + 'kcal입니다. ', self)
+        self.myLayout.addWidget(label4)
+        self.myLayout.addWidget(label5)
+        self.myLayout.addWidget(label6)
+
+
+        # 횟수 콤보박스
+        combo1 = QComboBox(self)
+        for i in range(dataset.goal_set):
+            combo1.addItem(str(i+1))
+        combo1.activated[str].connect(lambda :self.selectedComboItem(combo1, dataset))
+        self.myMiniLayout.addWidget(combo1, 0,0)
+
+        # 다시 시작 버튼
+        btn_replay = QPushButton("RePlay")
+        btn_replay.clicked.connect(self.Clicked_Replay_Button)
+        self.myMiniLayout.addWidget(btn_replay, 0,1)
+
+        # 홈 버튼
+        btn_home = QPushButton("Home")
+        btn_home.clicked.connect(self.Clicked_Home_Button)
+        self.myMiniLayout.addWidget(btn_home, 0,2)
+        
+        # 종료 버튼
+        btn_exit = QPushButton("Exit")
+        btn_exit.clicked.connect(self.Clicked_Exit_Button)
+        self.myMiniLayout.addWidget(btn_exit, 0,3)
+
+        self.myLayout.addLayout(self.myMiniLayout)
 
         self.show()
 
+    def selectedComboItem(self, text, dataset):
+        # index 접근을 위한 -1
+        dataset.want_replay_set = int(text.currentText())-1
+        print(dataset.want_replay_set)
+
     def Clicked_Replay_Button(self):
         dataset.isReplay = True
+        # dataset.want_replay_set를 통해서 리플레이 구현하기
         print('리플레이 구현하기')
         QCoreApplication.instance().quit()
 
