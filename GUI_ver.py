@@ -22,6 +22,8 @@ from GUI.make_graph import make_graph
 
 # GUI_form -> AI -> GUI_result
 
+wantcam = False
+
 class GUI_data():
     def __init__(self):
         # GUI_form
@@ -157,18 +159,16 @@ class AI_Train():
         print(dataset.weight, dataset.goal_cnt, dataset.goal_set)
        
         cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
-        #cap=cv2.VideoCapture(0) #카메라 번호
        
-        
         # 동영상으로 저장하기 위한 코드
-        w = 1280#round(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        h = 720#round(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        w = 1280    #round(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        h = 720     #round(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fps = cap.get(cv2.CAP_PROP_FPS) # 카메라에 따라 값이 정상적, 비정상적
         print(w,h, fps)
         fourcc = cv2.VideoWriter_fourcc(*'DIVX')
         out = cv2.VideoWriter('./play_results/output_' + str(dataset.cur_set_num) + '.avi', fourcc, fps, (w, h))
 
-        # 사전 준비시간을 label0으로 잘라내기 위한 작업
+        # 사전 준비시간을 label0으로 잘라내기 위한 작업 - 실시간캠이면 삭제.
         with open('video_list.txt', 'r') as infile:
             data = infile.readlines()
             for i in data:
@@ -201,6 +201,7 @@ class AI_Train():
         class_var.train_csv()
 
         # (준비된)영상 출력을 위한 변수
+        #detector =pm.poseDetector("cam")
         detector =pm.poseDetector(video_name)
 
         while True:
