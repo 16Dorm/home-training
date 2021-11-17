@@ -5,6 +5,7 @@ __pycache__
 image/
 wandb/
 results/
+!play_results/.keep
 
 video_name.txt
 
