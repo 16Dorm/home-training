@@ -1,5 +1,4 @@
 # GUI
-import os
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -206,6 +205,7 @@ class AI_Train():
         detector =pm.poseDetector(video_name)
 
         while True:
+            
             success, img = cap.read()
             if not success:
                 break
@@ -281,6 +281,8 @@ class AI_Train():
                 
                 # 카운트 확인
                 count, isCorrect = pushup_instance.cal_count(cur_label)
+                if(count == dataset.goal_cnt):
+                    break
 
                 # 정확도 체크 시작
                 if dataset.accuracy == False and cur_label == 3:
@@ -525,7 +527,8 @@ if __name__ == '__main__':
     
     dataset = GUI_data()
 
-    os.mkdir('play_results')
+    if not os.path.exists('play_results'):
+        os.mkdir('play_results')
 
     while(dataset.Home):
         # 변수 초기화
