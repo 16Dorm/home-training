@@ -1,4 +1,5 @@
 # GUI
+import os
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -523,6 +524,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     
     dataset = GUI_data()
+
+    os.mkdir('play_results')
 
     while(dataset.Home):
         # 변수 초기화
