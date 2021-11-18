@@ -482,7 +482,19 @@ class GUI_result(QWidget):
         dataset.isReplay = True
         # dataset.want_replay_set를 통해서 리플레이 구현하기
         print('리플레이 구현하기')
-        QCoreApplication.instance().quit()
+
+        result_cap = cv2.VideoCapture('./play_results/output_' + str(dataset.want_replay_set) + '.avi')
+        
+        while result_cap.isOpened():
+            run, frame = result_cap.read()
+            if not run:
+                break
+            cv2.imshow('video', frame)
+            if cv2.waitKey(30) & 0xFF == ord('q'):
+                break
+        
+        result_cap.release()
+        cv2.destroyAllWindows()
 
     def Clicked_Home_Button(self):
         dataset.Home = True
