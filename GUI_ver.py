@@ -159,7 +159,7 @@ class AI_Train():
         print(dataset.weight, dataset.goal_cnt, dataset.goal_set)
        
         cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
-       
+        #cap = cv2.VideoCapture(0)
         # 동영상으로 저장하기 위한 코드
         w = 1280    #round(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         h = 720     #round(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -281,6 +281,7 @@ class AI_Train():
                 
                 # 카운트 확인
                 count, isCorrect = pushup_instance.cal_count(cur_label)
+                print('count : ' + str(count)+ ' isCorrect : ' + str(isCorrect))
                 if(count == dataset.goal_cnt):
                     break
 
