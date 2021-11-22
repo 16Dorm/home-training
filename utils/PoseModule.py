@@ -8,7 +8,7 @@ import math #angle을 구하기위해서 사용
 
 #클래스 선언
 class poseDetector():
-    def __init__(self, video_name, mode=False, upBody=2,smooth=True,
+    def __init__(self, video_name, mode=False, upBody=1,smooth=True,
                  detectionCon=0.5, trackingCon=0.5): #파이썬 클래스, false를 주어 빠른 감지를함
         # static_image_mode = False,
         # upper_body_only=False,
@@ -24,7 +24,7 @@ class poseDetector():
         self.mpDraw=mp.solutions.drawing_utils
         #포즈를 감지하여 여기에 쓸것임.
         self.mpPose=mp.solutions.pose
-        self.pose = self.mpPose.Pose(self.mode,self.upBody,self.smooth, self.detectionCon,self.trackingCon)
+        self.pose = self.mpPose.Pose(self.mode,self.upBody,self.smooth, False, False, self.detectionCon,self.trackingCon)
 
         if not os.path.exists("./dataset/train/image"): # train/image폴더 생성
             os.makedirs('./dataset/train/image')

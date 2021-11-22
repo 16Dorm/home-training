@@ -13,8 +13,8 @@ Embedded System Engineering Capstone Design Project Repository
 ## Requirements
 
 - Python == 3.8.11 (3.9 Not worked!)
-- MediaPipe == 0.8.2
-- OpenCV == 4.5.3
+- MediaPipe == 0.8.9
+- OpenCV == 4.5.4.60
 - numpy == 1.19.3
 - sklearn == 1.0
 - pandas == 1.3.3
@@ -23,12 +23,13 @@ Embedded System Engineering Capstone Design Project Repository
 conda create -n home-training python=3.8
 conda activate home-training
 
-pip install mediapipe==0.8.2
+pip install mediapipe==0.8.9
 pip install sklearn
 pip install pandas
 pip install pillow
 pip install pyqt5
 pip install matplotlib
+pip install opencv-python==4.5.4.60
 conda install pytorch
 ```
 
@@ -38,8 +39,8 @@ pip install -U albumentations
 pip install torchmetrics
 pip install tqdm
 pip install timm
-pip uninstall opencv-python 
-pip install opencv-python
+pip uninstall opencv-python
+pip install opencv-python==4.5.4.60 
 ```
   
 
