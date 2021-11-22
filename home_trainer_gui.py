@@ -43,6 +43,8 @@ class GUI_data():
 
         self.cur_set_num = 0
 
+        self.cur_light = 'black'
+
         # GUI_Timer
         self.interval_sec_per_set = 10
 

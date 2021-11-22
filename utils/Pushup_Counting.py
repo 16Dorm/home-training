@@ -7,6 +7,7 @@ class Pushup_Counting:
 
     def __init__(self):
         self.label_table = [3,2,1,2]
+        self.start_count = 0
         self.count = 0
         self.semi_count = 0
         self.zeors_count = 0
@@ -25,51 +26,6 @@ class Pushup_Counting:
         
         self.result = True
 
-        '''
-        if self.cur_label == 0:
-            self.zeors_count += 1
-            self.result = False
-            if self.zeors_count > 10:
-                self.semi_count = 0
-                self.prediction = 3
-                self.pre_label = self.cur_label
-        elif self.pre_label != self.cur_label:
-            if self.cur_label == self.prediction:
-                if self.semi_count == 4:
-                    self.count += 1
-                    self.semi_count = 0
-                self.zeors_count = 0
-                self.semi_count += 1
-                self.deadline_count = 0
-                self.prediction = self.label_table[self.semi_count%4]
-                self.pre_label = self.cur_label
-            else:
-                self.deadline_count += 1
-                if self.deadline_count > 3:
-                    self.result = False
-                    self.semi_count = 0
-                    self.zeors_count = 0
-                    self.deadline_count = 0
-                    self.prediction = 3
-                    self.pre_label = -1
-        
-        if self.cur_label == 0:
-            self.result=False
-            self.zeors_count+=1
-
-            if self.zeors_count > 3 and self.prediction != 3:
-                self.semi_count = 0
-                self.prediction = 3
-                self.pre_label = self.cur_label
-
-
-        elif self.cur_label == self.prediction:
-            self.prediction += self.flag
-            
-            if self.prediction==1:
-                self.flag *= -1
-        
-        '''
         #0이 들어올 시
         if self.cur_label == 0 :
             #아직 시작 전일 때
@@ -87,15 +43,20 @@ class Pushup_Counting:
   
         # 3이 맨처음 들어왔을 때 시작 해줌
         if self.cur_label == 3 and self.start == False :
-            self.start = True
-            self.pre_label = self.cur_label
-            self.prediction += self.flag
+
+            if(self.start_count == 10):
+                self.start=True
+            else:
+                self.start_count += 1
+
+            if(self.start_count == 0) : 
+                self.pre_label = self.cur_label
+                self.prediction += self.flag
 
         #이전값하고 똑같을 시
         if self.cur_label == self.pre_label and self.start == True:
             self.result=True
             self.zeros_count = 0
-
 
         # 예상값이 잘 들어 왔을 때
         if self.cur_label == self.prediction and self.start == True:
@@ -117,4 +78,6 @@ class Pushup_Counting:
                 self.prediction = 2
                 self.pre_label = self.cur_label
         
-        return self.count, self.result
+        print('cur : ', self.cur_label, ' ', self.start)
+        
+        return self.count, self.result, self.start

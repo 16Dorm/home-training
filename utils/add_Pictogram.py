@@ -3,7 +3,10 @@ import cv2
 def add_Pictogram(img, label):
 
     src1 = img
-    src2 = cv2.imread("./utils/images/Pictogram_" + str(label+1) + ".png") #로고파일 읽기
+    if(label == 0):
+        src2 = cv2.imread("./utils/images/Pictogram_1.png")
+    else:
+        src2 = cv2.imread("./utils/images/Pictogram_" + label + ".png")
     
     x_pos = 1030
     y_pos = 570

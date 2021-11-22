@@ -6,6 +6,7 @@ import numpy as np
 import time
 import utils.PoseModule as pm
 from utils.add_Pictogram import add_Pictogram
+from utils.add_Lights import add_Lights
 from utils.defineLabel import defineLabel
 from utils.Pushup_Counting import Pushup_Counting
 
@@ -27,6 +28,8 @@ class GUI_data():
 
         self.cur_set_num = 0
 
+        self.cur_light = 'black'
+
         # GUI_Timer
         self.interval_sec_per_set = 10
 
@@ -40,7 +43,8 @@ class HomeTrainer():
     def run_pose_estimation(video_name, dataset):
         print(dataset.weight, dataset.goal_cnt, dataset.goal_set)
         print(video_name)
-        cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
+        #cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
+        cap = cv2.VideoCapture(0)
        
         # 동영상으로 저장하기 위한 코드
         w = 1280    #round(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -162,19 +166,25 @@ class HomeTrainer():
                 label_list.append([index, answer]) # index별로 뽑기위해 keypoint 리스트에 추가  
                 
                 # 카운트 확인
-                count, isCorrect = pushup_instance.cal_count(cur_label)
+                count, isCorrect, isStart = pushup_instance.cal_count(cur_label)
                 if(count == dataset.goal_cnt):
                     break
 
                 # 정확도 체크 시작
-                if dataset.accuracy == False and cur_label == 3:
-                    dataset.accuracy = True
-                
-                if dataset.accuracy == True:
-                    dataset.full_frames += 1
+                if isStart == True:
+                    if dataset.accuracy == False and cur_label == 3:
+                        dataset.accuracy = True
+                    
+                    if dataset.accuracy == True:
+                        dataset.full_frames += 1
+                        dataset.cur_light = 'green'
 
-                if(not(isCorrect) and dataset.accuracy == True):
-                    dataset.incorrect_frames += 1
+                    if(not(isCorrect) and dataset.accuracy == True):
+                        dataset.incorrect_frames += 1
+                        dataset.cur_light = 'red'
+
+                add_Lights(img, dataset.cur_light)
+
 
             # 카운팅 횟수/게이지 바 그리기 
             #draw angle bar
@@ -195,14 +205,14 @@ class HomeTrainer():
             else:
                 cv2.putText(img, str(int(count)), (1020,640), cv2.FONT_HERSHEY_PLAIN, 8, (180, 50, 50), 15)
 
-            # 프레임 그리기
-            cTime = time.time()
-            fps = 1/(cTime-pTime)
-            pTime = cTime
-            cv2.putText(img, str(int(fps)), (50, 100), cv2.FONT_HERSHEY_PLAIN, 5, (255, 0, 0), 5)
+            # # 프레임 그리기
+            # cTime = time.time()
+            # fps = 1/(cTime-pTime)
+            # pTime = cTime
+            # cv2.putText(img, str(int(fps)), (50, 100), cv2.FONT_HERSHEY_PLAIN, 5, (255, 0, 0), 5)
 
             # 픽토그램 그리기
-            img = add_Pictogram(img, int(per/34))
+            img = add_Pictogram(img, cur_label)
 
             # 최종 출력
             cv2.imshow("Image",img)
