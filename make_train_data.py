@@ -1,7 +1,7 @@
 import math
 import cv2
 import numpy as np
-import PoseModule as pm
+import utils.PoseModule as pm
 from utils.defineLabel import defineLabel
 from utils.WriteCSV import WriteCSV
 

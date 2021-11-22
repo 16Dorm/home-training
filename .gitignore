@@ -6,7 +6,7 @@ image/
 wandb/
 results/
 
-play_results\.gitignore
+play_results/
 
 video_name.txt
 
