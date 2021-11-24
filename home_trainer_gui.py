@@ -363,7 +363,7 @@ if __name__ == '__main__':
 
             for i in range(dataset.goal_set):
                 # AI
-                HomeTrainer.run_pose_estimation("pushup_18", dataset)
+                HomeTrainer.run_pose_estimation("pushup_07", dataset)
 
                 # graph 생성
                 make_graph(dataset.incorrect_frames, dataset.full_frames, dataset.cur_set_num)
@@ -381,6 +381,7 @@ if __name__ == '__main__':
                 dataset.incorrect_frames_total += dataset.incorrect_frames
                 dataset.full_frames = 0
                 dataset.incorrect_frames = 0
+                dataset.cur_light = 'black'
 
                 # 현재 set 카운트
                 dataset.cur_set_num += 1

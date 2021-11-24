@@ -6,7 +6,7 @@ def add_Pictogram(img, label):
     if(label == 0):
         src2 = cv2.imread("./utils/images/Pictogram_1.png")
     else:
-        src2 = cv2.imread("./utils/images/Pictogram_" + label + ".png")
+        src2 = cv2.imread("./utils/images/Pictogram_" + str(label) + ".png")
     
     x_pos = 1030
     y_pos = 570

@@ -43,8 +43,8 @@ class HomeTrainer():
     def run_pose_estimation(video_name, dataset):
         print(dataset.weight, dataset.goal_cnt, dataset.goal_set)
         print(video_name)
-        #cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture("./Video/" + video_name + ".mp4")
+        #cap = cv2.VideoCapture(0)
        
         # 동영상으로 저장하기 위한 코드
         w = 1280    #round(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
