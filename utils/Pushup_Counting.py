@@ -44,7 +44,7 @@ class Pushup_Counting:
         # 3이 맨처음 들어왔을 때 시작 해줌
         if self.cur_label == 3 and self.start == False :
 
-            if(self.start_count == 10):
+            if(self.start_count == 30):
                 self.start=True
             else:
                 self.start_count += 1
@@ -78,6 +78,6 @@ class Pushup_Counting:
                 self.prediction = 2
                 self.pre_label = self.cur_label
         
-        print('cur : ', self.cur_label, ' ', self.start)
+        #print('cur : ', self.cur_label, ' ', self.start)
         
         return self.count, self.result, self.start

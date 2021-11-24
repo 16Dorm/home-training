@@ -169,7 +169,9 @@ class GUI_timer(QWidget):
         self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
 
         # 창 사이즈 고정
-        self.setFixedSize(308, 600)
+        img = cv2.imread('./play_results/graph_' + str(dataset.cur_set_num) +'.png')
+        h, w, c = img.shape
+        self.setFixedSize(int(w)+int(w)/10, 600)
 
         # 레이아웃 설정
         self.mylayout = QVBoxLayout()
@@ -224,7 +226,9 @@ class GUI_result(QWidget):
         self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
 
         # # 창 사이즈 고정
-        self.setFixedSize(308, 500)
+        img = cv2.imread('./play_results/graph_total.png')
+        h, w, c = img.shape
+        self.setFixedSize(int(w)+int(w)/10, 500)
 
         # 레이아웃
         # QVBoxLayout()
