@@ -1,3 +1,2 @@
-__all__ = ["SkeletonDataset", "SkeletonDataLoader"]
-from . import SkeletonDataset
+__all__ = ["SkeletonCSV"]
 from . import SkeletonCSV

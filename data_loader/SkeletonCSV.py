@@ -1,7 +1,5 @@
 import os
-from .SkeletonDataset import SkeletonDataset
 import pandas as pd
-from torch.utils.data import DataLoader
 
 class SkeletonCSV():
     def __init__(self, data_dir, trsfm=None):
@@ -18,10 +16,7 @@ class SkeletonCSV():
         self.df = pd.read_csv(train_csv_path, names=self.columns)
         self.test_df = pd.read_csv(test_csv_path, names=self.columns)
 
-    def get_dataset_dataloader(self):
-        self.data = SkeletonDataset(self.df, self.trsfm)
-        self.dataloaders = DataLoader(self.data)
-        return  self.data, self.dataloaders
+
 
 if __name__ == "__main__":
     dataloader = SkeletonCSV("./dataset")

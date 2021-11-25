@@ -5,11 +5,11 @@ __pycache__
 image/
 wandb/
 results/
-
 play_results/
 
-video_name.txt
+build/
 
 # 테스트 파일
 test*.py
 !play_results/.gitkeep
+video_name.txt

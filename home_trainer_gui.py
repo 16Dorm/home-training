@@ -5,20 +5,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from time import sleep
 import os
-# AI
-from numpy.core import fromnumeric
-from classification_model.SupervisedLearning import classification
-from math import inf
-import math
 import cv2
-import numpy as np
-import time
-import utils.PoseModule as pm
 
-from utils.add_Pictogram import add_Pictogram
-from utils.defineLabel import defineLabel
-from utils.WriteCSV import WriteCSV
-from utils.Pushup_Counting import Pushup_Counting
 from GUI.make_graph import make_graph
 from home_trainer import HomeTrainer
 # GUI_form -> AI -> GUI_result
@@ -343,12 +331,16 @@ class GUI_result(QWidget):
         
 if __name__ == '__main__':
 
+    f = open("video_name.txt", 'r')
+    video_name = f.readline().rstrip()
+
     app = QApplication(sys.argv)
     
     dataset = GUI_data()
 
     if not os.path.exists('play_results'):
         os.mkdir('play_results')
+
 
     while(dataset.Home):
         # 변수 초기화
@@ -367,7 +359,7 @@ if __name__ == '__main__':
 
             for i in range(dataset.goal_set):
                 # AI
-                HomeTrainer.run_pose_estimation("pushup_07", dataset)
+                HomeTrainer.run_pose_estimation(video_name, dataset)
 
                 # graph 생성
                 make_graph(dataset.incorrect_frames, dataset.full_frames, dataset.cur_set_num)
