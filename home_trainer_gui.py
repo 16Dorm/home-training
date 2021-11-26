@@ -225,6 +225,9 @@ class GUI_result(QWidget):
         self.setWindowTitle('HomeTrainer')
         self.setWindowIcon(QIcon('./GUI/symbol_icon.png'))
 
+        # graph 생성
+        make_graph(dataset.incorrect_frames_total, dataset.full_frames_total, 'total')
+        
         # # 창 사이즈 고정
         img = cv2.imread('./play_results/graph_total.png')
         h, w, c = img.shape
@@ -235,9 +238,6 @@ class GUI_result(QWidget):
         self.myLayout = QVBoxLayout()
         self.myMiniLayout = QGridLayout()
         self.setLayout(self.myLayout)
-
-        # graph 생성
-        make_graph(dataset.incorrect_frames_total, dataset.full_frames_total, 'total')
 
         # 이미지 라벨
         label1 = QLabel(self)
