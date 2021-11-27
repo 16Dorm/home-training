@@ -8,6 +8,7 @@ results/
 play_results/
 
 build/
+dist/
 
 # 테스트 파일
 test*.py
