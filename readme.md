@@ -12,9 +12,9 @@ Embedded System Engineering Capstone Design Project Repository
 
 ## Requirements
 
-- Python == 3.8.11 (3.9 Not worked!)
+- Python == 3.8.11
 - MediaPipe == 0.8.9
-- OpenCV == 4.5.4.60
+- OpenCV == 4.5.3.56
 - numpy == 1.19.3
 - sklearn == 1.0
 - pandas == 1.3.3
@@ -29,8 +29,7 @@ pip install pandas
 pip install pillow
 pip install pyqt5
 pip install matplotlib
-pip install opencv-python==4.5.4.60
-conda install pytorch
+pip install opencv-python==4.5.3.56 
 ```
 
 ```
@@ -40,7 +39,7 @@ pip install torchmetrics
 pip install tqdm
 pip install timm
 pip uninstall opencv-python
-pip install opencv-python==4.5.4.60 
+pip install opencv-python==4.5.3.56
 ```
   
 
