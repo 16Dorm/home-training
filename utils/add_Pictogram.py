@@ -3,8 +3,8 @@ import cv2
 def add_Pictogram(img, label):
 
     src1 = img
-    if(label == 0):
-        src2 = cv2.imread("./utils/images/Pictogram_1.png")
+    if(label <= 0):
+        src2 = cv2.imread("./utils/images/Pictogram_3.png")
     else:
         src2 = cv2.imread("./utils/images/Pictogram_" + str(label) + ".png")
     
